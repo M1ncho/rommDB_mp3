@@ -1,3 +1,14 @@
 <resources>
     <string name="app_name">sonicdutch</string>
+    <string name="notice">공지사항</string>
+    <string name="download">설멍서 다운로드</string>
+    <string name="way">사용 방법</string>
+    <string name="maintenance">A/S 문의</string>
+    <string name="call">전화 상담</string>
+    <string name="song">뮤직 플레이어</string>
+    <string name="Qan_a">Q/A 게시판</string>
+    <string name="recipes">레시피 공유</string>
+    <string name="as_maneger">A/S 담당자</string>
+    <string name="as_call">전화 걸기</string>
+    <string name="as_send">문자 보내기</string>
 </resources>

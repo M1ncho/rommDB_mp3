@@ -3,4 +3,16 @@
     <color name="colorPrimary">#6200EE</color>
     <color name="colorPrimaryDark">#3700B3</color>
     <color name="colorAccent">#03DAC5</color>
+    <color name="top_color">#f5f5f5</color>
+    <color name="notice_color">#8ccbda</color>
+    <color name="down_color">#85c3b8</color>
+    <color name="way_color">#dca680</color>
+    <color name="maintan_color">#87839c</color>
+    <color name="call_color">#feb849</color>
+    <color name="song_color">#3c7b8c</color>
+    <color name="qan_color">#6274a5</color>
+    <color name="recipes_color">#fb6767</color>
+    <color name="bottom_color">#202020</color>
+    <color name="text_color">#0b3b6c</color>
+    <color name="text_color2">#5c5858</color>
 </resources>
