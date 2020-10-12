@@ -8,8 +8,21 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import kotlinx.android.synthetic.main.activity_main.*
+import java.text.DateFormat
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.util.*
+
 
 class MainActivity : AppCompatActivity() {
+
+    val now: Long = System.currentTimeMillis()
+    val date = Date(now)
+
+
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,7 +79,7 @@ class MainActivity : AppCompatActivity() {
         }
 
 
-        
+
         tv_call.setOnClickListener {
 
             var builder = AlertDialog.Builder(this)
@@ -78,14 +91,18 @@ class MainActivity : AppCompatActivity() {
 
             call_tv.setOnClickListener {
 
-                Toast.makeText(this,"테스트",Toast.LENGTH_SHORT).show()
+                val num = Uri.parse("tel:010-7233-0754")
+                var callintent = Intent(Intent.ACTION_DIAL,num)                //전화 창으로만 가도록
+                startActivity(callintent)
             }
 
             send_tv.setOnClickListener {
 
+                val magnum = Uri.parse("sms:010-7233-0754")
+                var magintent = Intent(Intent.ACTION_SENDTO,magnum)
+                startActivity(magintent)
                 Toast.makeText(this,"테스트",Toast.LENGTH_SHORT).show()
             }
-
 
             builder.setView(poplayout)
             builder.create()
@@ -94,5 +111,23 @@ class MainActivity : AppCompatActivity() {
 
 
 
-    }
+        //데이터 베이스 내 노래??들을 재생
+        tv_song.setOnClickListener {
+
+
+
+
+        }
+
+
+
+
+
+
+
+
+
+    }    //oncreat 닫는
+
+
 }

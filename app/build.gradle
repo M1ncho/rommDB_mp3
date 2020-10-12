@@ -6,6 +6,7 @@ apply plugin: 'kotlin-kapt'
 
 android {
     compileSdkVersion 29
+    buildToolsVersion "29.0.2"
 
     defaultConfig {
         applicationId "com.sonicdutch.portal"
@@ -34,6 +35,9 @@ dependencies {
 
     implementation 'com.google.android.material:material:1.2.0'
 
+    implementation 'com.squareup.retrofit2:retrofit:2.8.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.8.0'
+
 
     def room_version = "2.2.5"
     implementation "androidx.room:room-runtime:$room_version"
@@ -41,6 +45,7 @@ dependencies {
 
     implementation "androidx.room:room-ktx:$room_version"
     //룸 데이터 베이스 라이브러리 추가
+
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
