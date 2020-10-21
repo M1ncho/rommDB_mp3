@@ -1,6 +1,7 @@
 package com.sonicdutch.portal
 
 import androidx.room.Dao
+import androidx.room.Insert
 import androidx.room.Query
 
 class Songdao {
@@ -9,8 +10,15 @@ class Songdao {
     interface SongDao
     {
 
-        @Query("SELECT url FROM tb_song WHERE time = :time_now and weather = :weather_now")
-        fun findUrl(time_now: Int, weather_now: Int): String
+        @Query("SELECT * FROM tb_song WHERE time = :time_now and weather = :weather_now")
+        suspend fun findUrl(time_now: Int, weather_now: Int): Songentitiy.Song
+
+
+        @Query("SELECT * FROM tb_song")
+        suspend fun getAll(): List<Songentitiy.Song>
+
+        @Insert
+        suspend fun insert(song : Songentitiy.Song)
 
     }
 

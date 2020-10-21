@@ -1,53 +1,70 @@
 package com.sonicdutch.portal
 
 import android.content.Context
-import android.os.Bundle
+import android.util.Log
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import java.util.concurrent.Executors
+
 
 
 class SongDatabase {
-
     @Database(entities = arrayOf(Songentitiy.Song::class),version = 1)
     abstract class songDatabase : RoomDatabase()
     {
         abstract fun songDao() : Songdao.SongDao
-        companion object
-        {
+
+        companion object {
             private var INSTANCE: songDatabase? = null
             fun getInstance(context: Context): songDatabase {
-                return buildDatabase(context)
-            }
 
-            private fun buildDatabase(context: Context): songDatabase{
-                return Room.databaseBuilder(context,songDatabase::class.java,"song_data").addCallback(object : RoomDatabase.Callback()
-                {
-                    override fun onCreate(db: SupportSQLiteDatabase) {
-                        super.onCreate(db)
+               if(INSTANCE==null)
+               {
+                   //synchronized(this){
+                       //INSTANCE=Room.databaseBuilder(context.applicationContext,songDatabase::class.java,"song.db").build() }
+                   INSTANCE = buildDatabase(context)
+               }
 
-                        Songentitiy.Song(1,0,0,"00")
-                        Songentitiy.Song(2,0,1,"01")
-                        Songentitiy.Song(3,0,2,"02")
-                        Songentitiy.Song(4,1,0,"10")
-                        Songentitiy.Song(5,1,1,"11")
-                        Songentitiy.Song(6,1,3,"12")
-                        Songentitiy.Song(7,2,0,"20")
-                        Songentitiy.Song(8,2,1,"21")
-                        Songentitiy.Song(9,2,2,"22")
-                        Songentitiy.Song(10,3,0,"30")
-                        Songentitiy.Song(11,3,1,"31")
-                        Songentitiy.Song(12,3,2,"32")
+                //buildDatabase(context)
+                return INSTANCE!!
+        }
 
-                    }
-                })
-                    .build()
+           private fun buildDatabase(context: Context): songDatabase {
+                return Room.databaseBuilder(context, songDatabase::class.java, "song_data")
+                    .addCallback(object : RoomDatabase.Callback() {
+                        override fun onCreate(db: SupportSQLiteDatabase) {
+                            super.onCreate(db)
+
+                            Log.e("api erroer", "songdb create error")
+
+                            CoroutineScope(Dispatchers.Main).launch {
+                                getInstance(context).songDao().insert(Songentitiy.Song(0,0, 0, "00"))
+                                getInstance(context).songDao().insert(Songentitiy.Song(1,1, 0, "10"))
+                                getInstance(context).songDao().insert(Songentitiy.Song(2,2, 0, "20"))
+                                getInstance(context).songDao().insert(Songentitiy.Song(3,3, 0, "30"))
+                                getInstance(context).songDao().insert(Songentitiy.Song(4,0, 1, "01"))
+                                getInstance(context).songDao().insert(Songentitiy.Song(5,1, 1, "11"))
+                                getInstance(context).songDao().insert(Songentitiy.Song(6,2, 1, "21"))
+                                getInstance(context).songDao().insert(Songentitiy.Song(7,3, 1, "31"))
+                                getInstance(context).songDao().insert(Songentitiy.Song(8,0, 2, "02"))
+                                getInstance(context).songDao().insert(Songentitiy.Song(9,1, 2, "12"))
+                                getInstance(context).songDao().insert(Songentitiy.Song(10,2, 2, "22"))
+                                getInstance(context).songDao().insert(Songentitiy.Song(11, 3, 2, "32"))
+
+                            }
+
+                        }
+
+
+                    }).build()
             }
         }
 
     }
-
-
 
 }

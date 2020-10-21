@@ -3,8 +3,11 @@ package com.sonicdutch.portal
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.AssetManager
 import android.location.Location
 import android.location.LocationManager
+import android.media.AudioManager
+import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -14,12 +17,19 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import kotlinx.android.synthetic.main.activity_main.*
-import retrofit2.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Query
-import java.text.DateFormat
-import java.text.SimpleDateFormat
+import java.io.File
+import java.io.FileInputStream
+import java.security.Provider
 import java.util.*
 import kotlin.text.toInt as toInt1
 
@@ -34,6 +44,9 @@ class MainActivity : AppCompatActivity() {
     var minu: Int? =null
     var date_now: String?= null
     var time_now: String? = null
+
+    lateinit var mediaPlayer: MediaPlayer
+
 
    private fun Date_time()
     {
@@ -56,12 +69,12 @@ class MainActivity : AppCompatActivity() {
         //시간조정.
         if(minu!! <30)
         {
-            time_now = String.format("%02d",time!!.toInt1()-1)+"30"
+            time_now = String.format("%02d", time!!.toInt1() - 1)+"30"
         }
 
         else
         {
-            time_now = String.format("%02d",time!!.toInt1())+minu
+            time_now = String.format("%02d", time!!.toInt1())+minu
         }
 
     }
@@ -70,54 +83,76 @@ class MainActivity : AppCompatActivity() {
 
     //현 위치
     var locationmanger : LocationManager? = null
-    private val REQUEST_CODE_LOCATION : Int = 2
+    private val REQUEST_CODE : Int = 2
     var latitude : Int? = null
     var longitude : Int? =null
 
 
 
-    //여기서 우류가 나는 것 같다ㅠㅠㅠㅠ
-    private fun getCurrentLoc()                                                                //값 반환시 : 반환형태 지정해줄 것것
+    //여기서 오류가 나는 것 같다ㅠㅠㅠㅠ
+    //메인 창이 닫히지 않게
+    private fun getCurrentLoc()
     {
         locationmanger = getSystemService(Context.LOCATION_SERVICE) as LocationManager?
-        var userlocation: Location = getLatLang()
+        var userlocation: Location? = getLatLang()
         if(userlocation != null)
         {
             latitude = userlocation.latitude.toInt()
             longitude = userlocation.longitude.toInt()
-            Log.d("cheak","$latitude, $longitude" )
+            Log.d("cheak", "$latitude, $longitude")
         }
 
     }
 
-    //여기서 우류가 나는 것 같다ㅠㅠㅠㅠ
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray)
+
+
+    //여기서 오류가 나는 것 같다ㅠㅠㅠㅠ
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>,
+        grantResults: IntArray
+    )
     {
-        when (requestCode)
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if(requestCode==REQUEST_CODE)
         {
-            REQUEST_CODE_LOCATION -> {
-                if(grantResults.isNotEmpty()&&grantResults[0]==PackageManager.PERMISSION_GRANTED)
-                {
-                    Toast.makeText(this,"권한승인 확인",Toast.LENGTH_SHORT).show()
-                    getLatLang()
-
-                }
-                else
-                {
-                    Toast.makeText(this,"권한거부 확인",Toast.LENGTH_SHORT).show()
-                }
+            if(grantResults[0]==PackageManager.PERMISSION_GRANTED)
+            {
+                getCurrentLoc()
             }
+            else
+            {
+                Toast.makeText(this, "권한이 없어 실행할 수 없습니다.", Toast.LENGTH_SHORT).show()
+            }
+
         }
+
+    }
+
+    override fun onResume() {
+        super.onResume()
     }
 
 
-    //여기서 우류가 나는 것 같다ㅠㅠㅠㅠ
+
+
+    //여기서 오류가 나는 것 같다ㅠㅠㅠㅠ
     private fun getLatLang(): Location? {
         var currentLatLng: Location? = null
-        if(ActivityCompat.checkSelfPermission(applicationContext, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-            && ActivityCompat.checkSelfPermission(applicationContext, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+        if(ActivityCompat.checkSelfPermission(
+                applicationContext,
+                android.Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+            && ActivityCompat.checkSelfPermission(
+                applicationContext,
+                android.Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED)
         {
-            ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION), this.REQUEST_CODE_LOCATION)
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),
+                this.REQUEST_CODE
+            )
 
         }
         else
@@ -125,7 +160,7 @@ class MainActivity : AppCompatActivity() {
             var locationProvider = LocationManager.GPS_PROVIDER
             currentLatLng = locationmanger?.getLastKnownLocation(locationProvider)
         }
-        return currentLatLng!!           //currentLatLng가 null이 아님을 표시
+        return currentLatLng           //currentLatLng가 null이 아님을 표시
     }
 
 
@@ -141,7 +176,7 @@ class MainActivity : AppCompatActivity() {
     )
 
     data class HEADER(
-        val resultCode : Int,
+        val resultCode: Int,
         val resultMsg: String
     )
 
@@ -155,7 +190,7 @@ class MainActivity : AppCompatActivity() {
     )
 
     data class ITEM(
-        val baseDate : Int,
+        val baseDate: Int,
         val baseTime: Int,
         val category: String,
         val fcstValue: Float
@@ -172,7 +207,7 @@ class MainActivity : AppCompatActivity() {
     //날씨검사. api활용하여 gson으로 파싱? 데이터 확인. (retrofit 사용)
     interface WeatherInterface
     {
-        @GET("getUltraSrtFcst"+"?serviceKey=6f6aP3gCujBq5ihYIEraET%2FDgrOvkij3nVmab7ZpPzHjVHWW7wWjM%2BXY5f5yA%2B5Nve%2BPAn68P66zPX%2F9gXSVnQ%3D%3D")
+        @GET("getUltraSrtFcst" + "?serviceKey=6f6aP3gCujBq5ihYIEraET%2FDgrOvkij3nVmab7ZpPzHjVHWW7wWjM%2BXY5f5yA%2B5Nve%2BPAn68P66zPX%2F9gXSVnQ%3D%3D")
         fun GetWeather(
             @Query("pageNo") page_num: Int,
             @Query("numOfRows") num_row: Int,
@@ -193,6 +228,14 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        mediaPlayer = MediaPlayer().apply {
+            setAudioStreamType(AudioManager.STREAM_MUSIC)
+        }
+
+
+
+
+
 
         tv_home.setOnClickListener {
             var in_home = Intent(Intent.ACTION_VIEW, Uri.parse("https://sonicdutch.modoo.at/"))
@@ -206,29 +249,44 @@ class MainActivity : AppCompatActivity() {
 
 
         tv_Maintenance.setOnClickListener {
-            var in_as = Intent(Intent.ACTION_VIEW, Uri.parse("http://palmcloud.co.kr/sonicdutch/view/contact_register.html"))
+            var in_as = Intent(
+                Intent.ACTION_VIEW,
+                Uri.parse("http://palmcloud.co.kr/sonicdutch/view/contact_register.html")
+            )
             startActivity(in_as)
         }
 
         tv_q_an.setOnClickListener {
-            var in_qanswer = Intent(Intent.ACTION_VIEW,Uri.parse("https://sonicdutch.modoo.at/?link=aa5s09di"))
+            var in_qanswer = Intent(
+                Intent.ACTION_VIEW,
+                Uri.parse("https://sonicdutch.modoo.at/?link=aa5s09di")
+            )
             startActivity(in_qanswer)
         }
 
 
         tv_recipes.setOnClickListener {
-            var in_recipes = Intent(Intent.ACTION_VIEW, Uri.parse("https://sonicdutch.modoo.at/?link=bv2huhtg"))
+            var in_recipes = Intent(
+                Intent.ACTION_VIEW,
+                Uri.parse("https://sonicdutch.modoo.at/?link=bv2huhtg")
+            )
             startActivity(in_recipes)
         }
 
 
         iv_face.setOnClickListener {
-            var in_face = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.facebook.com/soniccoldbrew"))
+            var in_face = Intent(
+                Intent.ACTION_VIEW,
+                Uri.parse("https://www.facebook.com/soniccoldbrew")
+            )
             startActivity(in_face)
         }
 
         iv_instar.setOnClickListener {
-            var in_instar = Intent(Intent.ACTION_VIEW,Uri.parse("https://www.instagram.com/sonicdutch"))
+            var in_instar = Intent(
+                Intent.ACTION_VIEW,
+                Uri.parse("https://www.instagram.com/sonicdutch")
+            )
             startActivity(in_instar)
         }
 
@@ -245,7 +303,10 @@ class MainActivity : AppCompatActivity() {
 
         tv_notice.setOnClickListener {
 
-            var in_notice = Intent(Intent.ACTION_VIEW, Uri.parse("https://sonicdutch.modoo.at/?link=3x3fk95u"))
+            var in_notice = Intent(
+                Intent.ACTION_VIEW,
+                Uri.parse("https://sonicdutch.modoo.at/?link=3x3fk95u")
+            )
             startActivity(in_notice)
         }
 
@@ -258,9 +319,22 @@ class MainActivity : AppCompatActivity() {
 
         tv_download.setOnClickListener {
 
-            var in_down = Intent(Intent.ACTION_VIEW, Uri.parse("http://palmcloud.co.kr/sonicdutch/module/manualDownload.php"))
+            var asset = resources.assets
+            val input = asset.open("SUPER SONIC_Product Guide.pdf")
+            //
+
+
+
+
+
+
+            var in_down = Intent(
+                Intent.ACTION_VIEW,
+                Uri.parse("http://palmcloud.co.kr/sonicdutch/module/manualDownload.php")
+            )
             startActivity(in_down)
         }
+
 
 
 
@@ -268,7 +342,7 @@ class MainActivity : AppCompatActivity() {
 
             var builder = AlertDialog.Builder(this)
 
-            var poplayout = layoutInflater.inflate(R.layout.popup_menu,null)
+            var poplayout = layoutInflater.inflate(R.layout.popup_menu, null)
 
             var call_tv : TextView=poplayout.findViewById(R.id.tv_as_call)
             var send_tv : TextView=poplayout.findViewById(R.id.tv_as_send)
@@ -276,15 +350,17 @@ class MainActivity : AppCompatActivity() {
             call_tv.setOnClickListener {
 
                 val num = Uri.parse("tel:010-7233-0754")
-                var callintent = Intent(Intent.ACTION_DIAL,num)                //전화 창으로만 가도록
+                var callintent = Intent(Intent.ACTION_DIAL, num)                //전화 창으로만 가도록
                 startActivity(callintent)
+                finish()
             }
 
             send_tv.setOnClickListener {
 
                 val magnum = Uri.parse("sms:010-7233-0754")
-                var magintent = Intent(Intent.ACTION_SENDTO,magnum)
+                var magintent = Intent(Intent.ACTION_SENDTO, magnum)
                 startActivity(magintent)
+                finish()
 
             }
 
@@ -295,48 +371,89 @@ class MainActivity : AppCompatActivity() {
 
 
 
-
         //데이터 베이스 내 노래??들을 재생
         tv_song.setOnClickListener {
 
+            //창이 닫히지 않게!!
             getCurrentLoc()
-            //RequestPermissionsResult()
+            onResume()
+
             Date_time()
 
-            var weather_key: Int? = null
 
-            var now_sky: Float? = null
-            var now_pty: Float? = null
+
+
+            var weather_key: Int? = null
+            var time_key: Int? = null
+
+            var now_sky: Float?
+            var now_pty: Float?
             var n_s: String? = null
             var n_p: String? = null
 
 
-            service.GetWeather(1,20,"JSON", date_now!!, time_now!!,
-                latitude.toString(), longitude.toString()).enqueue(object : Callback<WEATHER> {
+
+            service.GetWeather(
+                1, 20, "JSON", date_now!!, time_now!!,
+                latitude.toString(), longitude.toString()
+            ).enqueue(object : Callback<WEATHER> {
                 override fun onResponse(call: Call<WEATHER>, response: Response<WEATHER>) {
-                    if(response.isSuccessful)
-                    {
-                        now_pty= response.body()!!.response.body.items.item[5].fcstValue
+                    if (response.isSuccessful) {
+                        now_pty = response.body()!!.response.body.items.item[5].fcstValue
                         n_p = response.body()!!.response.body.items.item[5].category
 
                         now_sky = response.body()!!.response.body.items.item[15].fcstValue
                         n_s = response.body()!!.response.body.items.item[15].category
 
-                        //Toast.makeText(this@MainActivity,"$now_pty $now_sky $n_p $n_s",Toast.LENGTH_SHORT).show()
 
-
-                        if(now_pty!!>= 1)
-                            weather_key = 3
-
-                        else if(now_pty?.equals(0) ?: (0 == null) || now_sky!!<=2)
+                        //데이터 베이스에서 부를 url구별을 위한 key
+                        if (now_pty!! >= 1)
+                            weather_key = 2
+                        else if (now_pty?.equals(0) ?: (0 == null) || now_sky!! <= 2)
                             weather_key = 0
-
-                        else if(now_pty?.equals(0) ?: (0 == null) || now_sky!!>2 && now_sky!!<=4)
+                        else if (now_pty?.equals(0) ?: (0 == null) || now_sky!! > 2 && now_sky!! <= 4)
                             weather_key = 1
 
 
-                        Toast.makeText(this@MainActivity,"$weather_key",Toast.LENGTH_SHORT).show()
+                        if (time!!.toInt1() >= 3 && time!!.toInt1() < 6)
+                            time_key = 0
+                        else if (time!!.toInt1() >= 6 && time!!.toInt1() < 12)
+                            time_key = 1
+                        else if (time!!.toInt1() >= 12 && time!!.toInt1() < 20)
+                            time_key = 2
+                        else if (time!!.toInt1() >= 20 && time!!.toInt1() < 3)
+                            time_key = 3
 
+
+                        //Toast.makeText(this@MainActivity,"$weather_key , $time_key",Toast.LENGTH_SHORT).show()
+
+
+                        //url을 받아와 플레이 재생파트.
+                        //데이터 불러오기
+                        //기본 디폴트 url = 맑은날 12시
+
+                        var song_url = "http://"
+
+                        var songdb = SongDatabase.songDatabase.getInstance(this@MainActivity)
+
+                        CoroutineScope(Dispatchers.Main).launch {
+                            var song: Songentitiy.Song = songdb.songDao().findUrl(time_key!!, weather_key!!)
+                            song_url = song.url
+                            Log.e("Test", song_url)
+
+
+                            //미디어플레이 재생
+                            //팝업창
+
+
+
+                            mediaPlayer.setDataSource("https://dl.espressif.com/dl/audio/ff-16b-2c-44100hz.mp3")
+
+                            mediaPlayer.prepare()
+                            mediaPlayer.start()
+                            mediaPlayer.isLooping=true
+
+                        }
 
 
                     }
@@ -344,7 +461,7 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 override fun onFailure(call: Call<WEATHER>, t: Throwable) {
-                    Log.d("api",t.message)
+                    Log.d("api", t.message)
                 }
 
             })
@@ -352,12 +469,13 @@ class MainActivity : AppCompatActivity() {
 
 
 
-        }
-        //위젯 행동 완료???
+
+
+        } //버튼액션 완료
+
 
 
     }    //oncreat 닫는
-
 
 
 }

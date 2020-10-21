@@ -45,6 +45,8 @@ dependencies {
 
     implementation 'com.google.android.material:material:1.2.0'
 
+    implementation 'gun0912.ted:tedpermission:2.2.0'
+
     implementation 'com.squareup.retrofit2:retrofit:2.8.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.8.0'
 
@@ -56,6 +58,8 @@ dependencies {
     implementation "androidx.room:room-runtime:$room_version"
     kapt "androidx.room:room-compiler:$room_version"
     implementation "androidx.room:room-ktx:$room_version"
+    //implementation "androidx.room:room-coroutines:$roomVersion"
+
     //룸 데이터 베이스 라이브러리 추가
 
 
