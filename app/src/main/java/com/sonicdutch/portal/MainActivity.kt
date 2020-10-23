@@ -353,10 +353,10 @@ class MainActivity : AppCompatActivity() {
                 webViewClient = WebViewClient()
             }
             val pdf_url = "http://www.kccba.net/sonicdutch/manual.pdf"
-            val test = "http://blifestore.com/download/manual.pdf"
+            //val test = "http://blifestore.com/download/manual.pdf"
 
 
-            wb_pdf.loadUrl("https://drive.google.com/viewerng/viewer?embedded=true&url="+test)
+            wb_pdf.loadUrl("https://drive.google.com/viewerng/viewer?embedded=true&url="+pdf_url)
 
 
         }
