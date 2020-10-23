@@ -43,22 +43,31 @@ class SongDatabase {
                             Log.e("api erroer", "songdb create error")
 
                             CoroutineScope(Dispatchers.Main).launch {
-                                getInstance(context).songDao().insert(Songentitiy.Song(0,0, 0, "00"))
-                                getInstance(context).songDao().insert(Songentitiy.Song(1,1, 0, "10"))
-                                getInstance(context).songDao().insert(Songentitiy.Song(2,2, 0, "20"))
-                                getInstance(context).songDao().insert(Songentitiy.Song(3,3, 0, "30"))
-                                getInstance(context).songDao().insert(Songentitiy.Song(4,0, 1, "01"))
-                                getInstance(context).songDao().insert(Songentitiy.Song(5,1, 1, "11"))
-                                getInstance(context).songDao().insert(Songentitiy.Song(6,2, 1, "21"))
-                                getInstance(context).songDao().insert(Songentitiy.Song(7,3, 1, "31"))
-                                getInstance(context).songDao().insert(Songentitiy.Song(8,0, 2, "02"))
-                                getInstance(context).songDao().insert(Songentitiy.Song(9,1, 2, "12"))
-                                getInstance(context).songDao().insert(Songentitiy.Song(10,2, 2, "22"))
-                                getInstance(context).songDao().insert(Songentitiy.Song(11, 3, 2, "32"))
+
+                                Log.e("database start","make")
+
+                                getInstance(context).songDao().insert(Songentitiy.Song(0,0, 0, "http://kccba.net/sonicdutch/mp3/M0001.mp3"))
+                                getInstance(context).songDao().insert(Songentitiy.Song(1,1, 0, "http://kccba.net/sonicdutch/mp3/M0002-3.mp3"))
+                                getInstance(context).songDao().insert(Songentitiy.Song(2,2, 0, "http://kccba.net/sonicdutch/mp3/M0003-1.mp3"))
+                                getInstance(context).songDao().insert(Songentitiy.Song(3,3, 0, "http://kccba.net/sonicdutch/mp3/M0004.mp3"))
+                                getInstance(context).songDao().insert(Songentitiy.Song(4,0, 1, "http://kccba.net/sonicdutch/mp3/M0005.mp3"))
+                                getInstance(context).songDao().insert(Songentitiy.Song(5,1, 1, "http://kccba.net/sonicdutch/mp3/M0006.mp3"))
+                                getInstance(context).songDao().insert(Songentitiy.Song(6,2, 1, "http://kccba.net/sonicdutch/mp3/M0007-2.mp3"))
+                                getInstance(context).songDao().insert(Songentitiy.Song(7,3, 1, "http://kccba.net/sonicdutch/mp3/M0008-2.mp3"))
+                                getInstance(context).songDao().insert(Songentitiy.Song(8,0, 2, "http://kccba.net/sonicdutch/mp3/M0009.mp3"))
+                                getInstance(context).songDao().insert(Songentitiy.Song(9,1, 2, "http://kccba.net/sonicdutch/mp3/M0010.mp3"))
+                                getInstance(context).songDao().insert(Songentitiy.Song(10,2, 2, "http://kccba.net/sonicdutch/mp3/M0011.mp3"))
+                                getInstance(context).songDao().insert(Songentitiy.Song(11, 3, 2, "http://kccba.net/sonicdutch/mp3/M0012-2.mp3"))
+
+                                Log.e("test data","songdb create end")
 
                             }
 
+
                         }
+
+                        //onopen을 써바?
+
 
 
                     }).build()

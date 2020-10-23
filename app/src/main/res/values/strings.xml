@@ -11,4 +11,5 @@
     <string name="as_maneger">A/S 담당자</string>
     <string name="as_call">전화 걸기</string>
     <string name="as_send">문자 보내기</string>
+    <string name="song_error_notice">지금은 음악재생이 힘듭니다.</string>
 </resources>

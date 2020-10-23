@@ -3,7 +3,6 @@ package com.sonicdutch.portal
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.content.res.AssetManager
 import android.location.Location
 import android.location.LocationManager
 import android.media.AudioManager
@@ -11,6 +10,9 @@ import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -28,8 +30,6 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Query
 import java.io.File
-import java.io.FileInputStream
-import java.security.Provider
 import java.util.*
 import kotlin.text.toInt as toInt1
 
@@ -46,7 +46,7 @@ class MainActivity : AppCompatActivity() {
     var time_now: String? = null
 
     lateinit var mediaPlayer: MediaPlayer
-
+    lateinit var songdb: SongDatabase.songDatabase
 
    private fun Date_time()
     {
@@ -83,16 +83,19 @@ class MainActivity : AppCompatActivity() {
 
     //현 위치
     var locationmanger : LocationManager? = null
-    private val REQUEST_CODE : Int = 2
+    val REQUEST_CODE : Int = 2
     var latitude : Int? = null
     var longitude : Int? =null
 
 
 
+
+
     //여기서 오류가 나는 것 같다ㅠㅠㅠㅠ
     //메인 창이 닫히지 않게
-    private fun getCurrentLoc()
+    private fun getCurrentLoc() : Boolean
     {
+        var result:Boolean = false
         locationmanger = getSystemService(Context.LOCATION_SERVICE) as LocationManager?
         var userlocation: Location? = getLatLang()
         if(userlocation != null)
@@ -100,9 +103,16 @@ class MainActivity : AppCompatActivity() {
             latitude = userlocation.latitude.toInt()
             longitude = userlocation.longitude.toInt()
             Log.d("cheak", "$latitude, $longitude")
+
+            result = true;
         }
 
+        return result
+
     }
+
+
+    //ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), REQUEST_CODE)
 
 
 
@@ -132,7 +142,6 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
     }
-
 
 
 
@@ -233,6 +242,10 @@ class MainActivity : AppCompatActivity() {
         }
 
 
+        songdb = SongDatabase.songDatabase.getInstance(this@MainActivity)
+        CoroutineScope(Dispatchers.Main).launch {
+            songdb.songDao().getAll()
+        }
 
 
 
@@ -243,8 +256,16 @@ class MainActivity : AppCompatActivity() {
         }
 
         tv_way.setOnClickListener {
+
+            if(mediaPlayer.isPlaying)
+            {
+                mediaPlayer.stop()
+                mediaPlayer.release()
+            }
+
             var in_useway = Intent(Intent.ACTION_VIEW, Uri.parse("https://youtu.be/IptQbHSC4I0"))
             startActivity(in_useway)
+
         }
 
 
@@ -312,29 +333,33 @@ class MainActivity : AppCompatActivity() {
 
         iv_video.setOnClickListener {
 
+            if(mediaPlayer.isPlaying)
+            {
+                mediaPlayer.stop()
+                mediaPlayer.release()
+            }
+
             var in_video = Intent(Intent.ACTION_VIEW, Uri.parse("https://youtu.be/z_3FokLgjT4"))
             startActivity(in_video)
         }
 
 
         tv_download.setOnClickListener {
+            
 
-            var asset = resources.assets
-            val input = asset.open("SUPER SONIC_Product Guide.pdf")
-            //
+            wb_pdf.visibility = View.VISIBLE
+            wb_pdf.apply {
+                settings.javaScriptEnabled = true
+                webViewClient = WebViewClient()
+            }
+            val pdf_url = "http://www.kccba.net/sonicdutch/manual.pdf"
+            val test = "http://blifestore.com/download/manual.pdf"
 
 
+            wb_pdf.loadUrl("https://drive.google.com/viewerng/viewer?embedded=true&url="+test)
 
 
-
-
-            var in_down = Intent(
-                Intent.ACTION_VIEW,
-                Uri.parse("http://palmcloud.co.kr/sonicdutch/module/manualDownload.php")
-            )
-            startActivity(in_down)
         }
-
 
 
 
@@ -357,7 +382,7 @@ class MainActivity : AppCompatActivity() {
 
             send_tv.setOnClickListener {
 
-                val magnum = Uri.parse("sms:010-7233-0754")
+                val magnum = Uri.parse("sms:010-7233-0754")        //문자창으로만 이동
                 var magintent = Intent(Intent.ACTION_SENDTO, magnum)
                 startActivity(magintent)
                 finish()
@@ -374,108 +399,120 @@ class MainActivity : AppCompatActivity() {
         //데이터 베이스 내 노래??들을 재생
         tv_song.setOnClickListener {
 
-            //창이 닫히지 않게!!
-            getCurrentLoc()
-            onResume()
+                //창이 닫히지 않게!!
+                if(!getCurrentLoc()){return@setOnClickListener}
 
-            Date_time()
-
-
+                onResume()
+                Date_time()
 
 
-            var weather_key: Int? = null
-            var time_key: Int? = null
+                var weather_key: Int? = null
+                var time_key: Int? = null
 
-            var now_sky: Float?
-            var now_pty: Float?
-            var n_s: String? = null
-            var n_p: String? = null
+                var now_sky: Float?
+                var now_pty: Float?
+                var n_s: String? = null
+                var n_p: String? = null
 
 
 
-            service.GetWeather(
-                1, 20, "JSON", date_now!!, time_now!!,
-                latitude.toString(), longitude.toString()
-            ).enqueue(object : Callback<WEATHER> {
-                override fun onResponse(call: Call<WEATHER>, response: Response<WEATHER>) {
-                    if (response.isSuccessful) {
-                        now_pty = response.body()!!.response.body.items.item[5].fcstValue
-                        n_p = response.body()!!.response.body.items.item[5].category
+                service.GetWeather(
+                    1, 20, "JSON", date_now!!, time_now!!,
+                    latitude.toString(), longitude.toString()
+                ).enqueue(object : Callback<WEATHER> {
+                    override fun onResponse(call: Call<WEATHER>, response: Response<WEATHER>) {
+                        if (response.isSuccessful) {
+                            now_pty = response.body()!!.response.body.items.item[5].fcstValue
+                            n_p = response.body()!!.response.body.items.item[5].category
 
-                        now_sky = response.body()!!.response.body.items.item[15].fcstValue
-                        n_s = response.body()!!.response.body.items.item[15].category
-
-
-                        //데이터 베이스에서 부를 url구별을 위한 key
-                        if (now_pty!! >= 1)
-                            weather_key = 2
-                        else if (now_pty?.equals(0) ?: (0 == null) || now_sky!! <= 2)
-                            weather_key = 0
-                        else if (now_pty?.equals(0) ?: (0 == null) || now_sky!! > 2 && now_sky!! <= 4)
-                            weather_key = 1
+                            now_sky = response.body()!!.response.body.items.item[15].fcstValue
+                            n_s = response.body()!!.response.body.items.item[15].category
 
 
-                        if (time!!.toInt1() >= 3 && time!!.toInt1() < 6)
-                            time_key = 0
-                        else if (time!!.toInt1() >= 6 && time!!.toInt1() < 12)
-                            time_key = 1
-                        else if (time!!.toInt1() >= 12 && time!!.toInt1() < 20)
-                            time_key = 2
-                        else if (time!!.toInt1() >= 20 && time!!.toInt1() < 3)
-                            time_key = 3
+                            //데이터 베이스에서 부를 url구별을 위한 key
+                            if (now_pty!! >= 1)
+                                weather_key = 2
+                            else if (now_pty?.equals(0) ?: (0 == null) || now_sky!! <= 2)
+                                weather_key = 0
+                            else if (now_pty?.equals(0) ?: (0 == null) || now_sky!! > 2 && now_sky!! <= 4)
+                                weather_key = 1
 
 
-                        //Toast.makeText(this@MainActivity,"$weather_key , $time_key",Toast.LENGTH_SHORT).show()
+                            if (time!!.toInt1() >= 3 && time!!.toInt1() < 6)
+                                time_key = 0
+                            else if (time!!.toInt1() >= 6 && time!!.toInt1() < 12)
+                                time_key = 1
+                            else if (time!!.toInt1() >= 12 && time!!.toInt1() < 20)
+                                time_key = 2
+                            else if (time!!.toInt1() >= 20 && time!!.toInt1() < 3)
+                                time_key = 3
 
 
-                        //url을 받아와 플레이 재생파트.
-                        //데이터 불러오기
-                        //기본 디폴트 url = 맑은날 12시
+                            //url을 받아와 플레이 재생파트.
+                            //데이터 불러오기
+                            //기본 디폴트 url = 맑은날 12시
+                            var song_url = "http://kccba.net/M0003-1.mp3"
 
-                        var song_url = "http://"
+                            var song: String?
 
-                        var songdb = SongDatabase.songDatabase.getInstance(this@MainActivity)
+                            //var songdb = SongDatabase.songDatabase.getInstance(this@MainActivity)
 
-                        CoroutineScope(Dispatchers.Main).launch {
-                            var song: Songentitiy.Song = songdb.songDao().findUrl(time_key!!, weather_key!!)
-                            song_url = song.url
-                            Log.e("Test", song_url)
+                            CoroutineScope(Dispatchers.Main).launch {
+                                var song: Songentitiy.Song = songdb.songDao().findUrl(
+                                    time_key!!,
+                                    weather_key!!
+                                )
+
+                                song_url = song.url
+                                Log.e("Test", song_url)
 
 
-                            //미디어플레이 재생
-                            //팝업창
+                                try {
+
+                                    if(mediaPlayer.isPlaying)
+                                    {
+                                        mediaPlayer.stop()
+                                        mediaPlayer.reset()
+                                        return@launch
+
+                                    }
 
 
+                                    //미디어플레이 재생
+                                    else
+                                    {
+                                        mediaPlayer.setDataSource(song_url)
 
-                            mediaPlayer.setDataSource("https://dl.espressif.com/dl/audio/ff-16b-2c-44100hz.mp3")
+                                        mediaPlayer.prepare()
+                                        mediaPlayer.start()
+                                        mediaPlayer.isLooping = true
+                                    }
 
-                            mediaPlayer.prepare()
-                            mediaPlayer.start()
-                            mediaPlayer.isLooping=true
+                                }
+                                catch (e: Exception)
+                                {
+                                    Toast.makeText(this@MainActivity,"지금은 음악재생이 힘듭니다.",Toast.LENGTH_SHORT).show()
+                                    return@launch
+                                }
 
+
+                            }
                         }
-
 
                     }
 
-                }
+                    override fun onFailure(call: Call<WEATHER>, t: Throwable) {
+                        Log.d("api", t.message)
+                    }
 
-                override fun onFailure(call: Call<WEATHER>, t: Throwable) {
-                    Log.d("api", t.message)
-                }
-
-            })
-
-
-
-
-
+                })
 
         } //버튼액션 완료
 
 
 
     }    //oncreat 닫는
+
 
 
 }
