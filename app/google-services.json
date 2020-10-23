@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "179361220046",
+    "firebase_url": "https://sonicdutch-dd7db.firebaseio.com",
+    "project_id": "sonicdutch-dd7db",
+    "storage_bucket": "sonicdutch-dd7db.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:179361220046:android:13de3fbe4a601ca286579f",
+        "android_client_info": {
+          "package_name": "com.sonicdutch.portal"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "179361220046-3icejn8qpoilielo0iifh51j73taigj4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCdbb0W4yoMZ6ll61jxvWRPBGuA81Or-08"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "179361220046-3icejn8qpoilielo0iifh51j73taigj4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
