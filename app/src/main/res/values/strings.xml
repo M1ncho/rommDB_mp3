@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">sonicdutch</string>
     <string name="notice">공지사항</string>
-    <string name="download">설멍서 다운로드</string>
+    <string name="download">설명서 다운로드</string>
     <string name="way">사용 방법</string>
     <string name="maintenance">A/S 문의</string>
     <string name="call">전화 상담</string>
