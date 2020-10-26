@@ -509,7 +509,7 @@ class MainActivity : AppCompatActivity() {
                             }
                             catch (e: Exception)
                             {
-                                Toast.makeText(this@MainActivity,"지금은 음악재생이 힘듭니다.",Toast.LENGTH_SHORT).show()
+                                Toast.makeText(this@MainActivity,"음악을 재생할 수 없습니다. 관리자에게 문의 해주세요. ",Toast.LENGTH_SHORT).show()
                                 return@launch
                             }
 
