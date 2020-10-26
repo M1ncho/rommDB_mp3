@@ -80,39 +80,12 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-
     //현 위치
     var locationmanger : LocationManager? = null
     val REQUEST_CODE : Int = 2
     var latitude : Int? = null
     var longitude : Int? =null
-
-
-
-
-
-    //여기서 오류가 나는 것 같다ㅠㅠㅠㅠ
-    //메인 창이 닫히지 않게
-    private fun getCurrentLoc() : Boolean
-    {
-        var result:Boolean = false
-        locationmanger = getSystemService(Context.LOCATION_SERVICE) as LocationManager?
-        var userlocation: Location? = getLatLang()
-        if(userlocation != null)
-        {
-            latitude = userlocation.latitude.toInt()
-            longitude = userlocation.longitude.toInt()
-            Log.d("cheak", "$latitude, $longitude")
-
-            result = true;
-        }
-
-        return result
-
-    }
-
-
-    //ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), REQUEST_CODE)
+    //var currentLatLng: Location? = null
 
 
 
@@ -139,9 +112,67 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    override fun onResume() {
-        super.onResume()
+
+
+    private fun getCurrentLoc() : Boolean
+    {
+        var result:Boolean = false
+        locationmanger = getSystemService(Context.LOCATION_SERVICE) as LocationManager?
+        var userlocation: Location? = getLatLang()
+        if(userlocation != null)
+        {
+            latitude = userlocation.latitude.toInt()
+            longitude = userlocation.longitude.toInt()
+            //Log.e("cheak", "$latitude, $longitude")
+
+            result = true
+        }
+
+        /*else
+        {
+            latitude = 37
+            longitude = 126
+        }*/
+
+        return result
+
     }
+
+
+
+    //여기서 오류가 나는 것 같다ㅠㅠㅠㅠ
+    private fun getLatLang(): Location? {
+
+        //
+        var currentLatLng: Location? = null
+        if(ActivityCompat.checkSelfPermission(applicationContext, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+            && ActivityCompat.checkSelfPermission(applicationContext, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+        {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),
+                this.REQUEST_CODE
+            )
+
+        }
+
+        else
+        {
+            var locationProvider = LocationManager.GPS_PROVIDER
+            currentLatLng = locationmanger?.getLastKnownLocation(locationProvider)
+            if(currentLatLng == null)
+            {
+                currentLatLng = Location("blife_provider")
+                currentLatLng.latitude = 37.0
+                currentLatLng.longitude = 126.0
+            }
+
+        }
+
+        return currentLatLng      //currentLatLng가 null이 아님을 표시
+    }
+
+
 
 
     override fun onDestroy() {
@@ -152,37 +183,6 @@ class MainActivity : AppCompatActivity() {
             mediaPlayer.release()
         }
         finish()
-    }
-
-
-
-
-
-    //여기서 오류가 나는 것 같다ㅠㅠㅠㅠ
-    private fun getLatLang(): Location? {
-        var currentLatLng: Location? = null
-        if(ActivityCompat.checkSelfPermission(
-                applicationContext,
-                android.Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-            && ActivityCompat.checkSelfPermission(
-                applicationContext,
-                android.Manifest.permission.ACCESS_COARSE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED)
-        {
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),
-                this.REQUEST_CODE
-            )
-
-        }
-        else
-        {
-            var locationProvider = LocationManager.GPS_PROVIDER
-            currentLatLng = locationmanger?.getLastKnownLocation(locationProvider)
-        }
-        return currentLatLng           //currentLatLng가 null이 아님을 표시
     }
 
 
@@ -412,120 +412,126 @@ class MainActivity : AppCompatActivity() {
         //데이터 베이스 내 노래??들을 재생
         tv_song.setOnClickListener {
 
-                //창이 닫히지 않게!!
-                if(!getCurrentLoc()){return@setOnClickListener}
 
-                //onResume()
-                Date_time()
-
-
-                var weather_key: Int? = null
-                var time_key: Int? = null
-
-                var now_sky: Float?
-                var now_pty: Float?
-                var n_s: String? = null
-                var n_p: String? = null
+            //창이 닫히지 않게!!
+            //false값이 왔을 때
+            if(!getCurrentLoc())
+            {
+                return@setOnClickListener
+            }
 
 
-
-                service.GetWeather(
-                    1, 20, "JSON", date_now!!, time_now!!,
-                    latitude.toString(), longitude.toString()
-                ).enqueue(object : Callback<WEATHER> {
-                    override fun onResponse(call: Call<WEATHER>, response: Response<WEATHER>) {
-                        if (response.isSuccessful) {
-                            now_pty = response.body()!!.response.body.items.item[5].fcstValue
-                            n_p = response.body()!!.response.body.items.item[5].category
-
-                            now_sky = response.body()!!.response.body.items.item[15].fcstValue
-                            n_s = response.body()!!.response.body.items.item[15].category
+            Date_time()
 
 
-                            //데이터 베이스에서 부를 url구별을 위한 key
-                            if (now_pty!! >= 1)
-                                weather_key = 2
-                            else if (now_pty?.equals(0) ?: (0 == null) || now_sky!! <= 2)
-                                weather_key = 0
-                            else if (now_pty?.equals(0) ?: (0 == null) || now_sky!! > 2 && now_sky!! <= 4)
-                                weather_key = 1
+            var weather_key: Int? = null
+            var time_key: Int? = null
+
+            var now_sky: Float?
+            var now_pty: Float?
+            var n_s: String? = null
+            var n_p: String? = null
+
+            var song_url: String?
 
 
-                            if (time!!.toInt1() >= 3 && time!!.toInt1() < 6)
-                                time_key = 0
-                            else if (time!!.toInt1() >= 6 && time!!.toInt1() < 12)
-                                time_key = 1
-                            else if (time!!.toInt1() >= 12 && time!!.toInt1() < 20)
-                                time_key = 2
-                            else if (time!!.toInt1() >= 20 && time!!.toInt1() < 3)
-                                time_key = 3
+            service.GetWeather(
+                1, 20, "JSON", date_now!!, time_now!!,
+                latitude.toString(), longitude.toString()
+            ).enqueue(object : Callback<WEATHER> {
+                override fun onResponse(call: Call<WEATHER>, response: Response<WEATHER>) {
+                    if (response.isSuccessful) {
+                        now_pty = response.body()!!.response.body.items.item[5].fcstValue
+                        n_p = response.body()!!.response.body.items.item[5].category
+
+                        now_sky = response.body()!!.response.body.items.item[15].fcstValue
+                        n_s = response.body()!!.response.body.items.item[15].category
 
 
-                            //url을 받아와 플레이 재생파트.
-                            //데이터 불러오기
-                            //기본 디폴트 url = 맑은날 12시
-                            var song_url = "http://kccba.net/M0003-1.mp3"
-
-                            var song: String?
-
-                            //var songdb = SongDatabase.songDatabase.getInstance(this@MainActivity)
-
-                            CoroutineScope(Dispatchers.Main).launch {
-                                var song: Songentitiy.Song = songdb.songDao().findUrl(
-                                    time_key!!,
-                                    weather_key!!
-                                )
-
-                                song_url = song.url
-                                Log.e("Test", song_url)
+                        //데이터 베이스에서 부를 url구별을 위한 key
+                        if (now_pty!! >= 1)
+                            weather_key = 2
+                        else if (now_pty?.equals(0) ?: (0 == null) || now_sky!! <= 2)
+                            weather_key = 0
+                        else if (now_pty?.equals(0) ?: (0 == null) || now_sky!! > 2 && now_sky!! <= 4)
+                            weather_key = 1
 
 
-                                try {
+                        if (time!!.toInt1() >= 3 && time!!.toInt1() < 6)
+                            time_key = 0
+                        else if (time!!.toInt1() >= 6 && time!!.toInt1() < 12)
+                            time_key = 1
+                        else if (time!!.toInt1() >= 12 && time!!.toInt1() < 20)
+                            time_key = 2
+                        else if (time!!.toInt1() >= 20 && time!!.toInt1() < 3)
+                            time_key = 3
 
-                                    if(mediaPlayer.isPlaying)
-                                    {
-                                        mediaPlayer.stop()
-                                        mediaPlayer.reset()
-                                        return@launch
 
-                                    }
+                        //url을 받아와 플레이 재생파트.
+                        //데이터 불러오기
+                        //기본 디폴트 url = 맑은날 12시
+                        song_url = "http://kccba.net/M0003-1.mp3"
+
+                        var song: String?
+
+                        //var songdb = SongDatabase.songDatabase.getInstance(this@MainActivity)
+
+                        CoroutineScope(Dispatchers.Main).launch {
+                            var song: Songentitiy.Song = songdb.songDao().findUrl(
+                                time_key!!,
+                                weather_key!!
+                            )
+
+                            song_url = song.url
+                            Log.e("Test", song_url)
 
 
-                                    //미디어플레이 재생
-                                    else
-                                    {
-                                        mediaPlayer.setDataSource(song_url)
+                            try {
 
-                                        mediaPlayer.prepare()
-                                        mediaPlayer.start()
-                                        mediaPlayer.isLooping = true
-                                    }
-
-                                }
-                                catch (e: Exception)
+                                if(mediaPlayer.isPlaying)
                                 {
-                                    Toast.makeText(this@MainActivity,"지금은 음악재생이 힘듭니다.",Toast.LENGTH_SHORT).show()
+                                    mediaPlayer.stop()
+                                    mediaPlayer.reset()
                                     return@launch
+
                                 }
 
+                                //미디어플레이 재생
+                                else
+                                {
+                                    mediaPlayer.setDataSource(song_url)
+
+                                    mediaPlayer.prepare()
+                                    mediaPlayer.start()
+                                    mediaPlayer.isLooping = true
+                                }
 
                             }
+                            catch (e: Exception)
+                            {
+                                Toast.makeText(this@MainActivity,"지금은 음악재생이 힘듭니다.",Toast.LENGTH_SHORT).show()
+                                return@launch
+                            }
+
+
                         }
-
                     }
 
-                    override fun onFailure(call: Call<WEATHER>, t: Throwable) {
-                        Log.d("api", t.message)
-                    }
+                }
 
-                })
+                override fun onFailure(call: Call<WEATHER>, t: Throwable) {
+                    Log.d("api", t.message)
+                }
+
+            })
 
 
         } //버튼액션 완료
 
 
 
-    }    //oncreat 닫는
+    }
+    //oncreat 닫는
 
 
 
