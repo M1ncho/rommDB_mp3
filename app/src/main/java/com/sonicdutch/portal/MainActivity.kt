@@ -144,6 +144,19 @@ class MainActivity : AppCompatActivity() {
     }
 
 
+    override fun onDestroy() {
+        super.onDestroy()
+        if(mediaPlayer.isPlaying)
+        {
+            mediaPlayer.stop()
+            mediaPlayer.release()
+        }
+        finish()
+    }
+
+
+
+
 
     //여기서 오류가 나는 것 같다ㅠㅠㅠㅠ
     private fun getLatLang(): Location? {
@@ -246,8 +259,6 @@ class MainActivity : AppCompatActivity() {
         CoroutineScope(Dispatchers.Main).launch {
             songdb.songDao().getAll()
         }
-
-
 
 
         tv_home.setOnClickListener {
@@ -365,19 +376,24 @@ class MainActivity : AppCompatActivity() {
 
         tv_call.setOnClickListener {
 
+
             var builder = AlertDialog.Builder(this)
+
 
             var poplayout = layoutInflater.inflate(R.layout.popup_menu, null)
 
             var call_tv : TextView=poplayout.findViewById(R.id.tv_as_call)
             var send_tv : TextView=poplayout.findViewById(R.id.tv_as_send)
+            builder.setView(poplayout)
+            var dialog: AlertDialog = builder.create()
+
 
             call_tv.setOnClickListener {
 
                 val num = Uri.parse("tel:010-7233-0754")
                 var callintent = Intent(Intent.ACTION_DIAL, num)                //전화 창으로만 가도록
                 startActivity(callintent)
-                finish()
+                dialog.dismiss()
             }
 
             send_tv.setOnClickListener {
@@ -385,13 +401,10 @@ class MainActivity : AppCompatActivity() {
                 val magnum = Uri.parse("sms:010-7233-0754")        //문자창으로만 이동
                 var magintent = Intent(Intent.ACTION_SENDTO, magnum)
                 startActivity(magintent)
-                finish()
-
+                dialog.dismiss()
             }
 
-            builder.setView(poplayout)
-            builder.create()
-            builder.show()
+            dialog.show()
         }
 
 
@@ -402,7 +415,7 @@ class MainActivity : AppCompatActivity() {
                 //창이 닫히지 않게!!
                 if(!getCurrentLoc()){return@setOnClickListener}
 
-                onResume()
+                //onResume()
                 Date_time()
 
 
@@ -506,6 +519,7 @@ class MainActivity : AppCompatActivity() {
                     }
 
                 })
+
 
         } //버튼액션 완료
 
