@@ -15,4 +15,7 @@
     <color name="bottom_color">#202020</color>
     <color name="text_color">#0b3b6c</color>
     <color name="text_color2">#5c5858</color>
+    <color name="playlist_color">#ff9800</color>
+    <color name="music_main_color">#474747</color>
+
 </resources>

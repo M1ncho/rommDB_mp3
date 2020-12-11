@@ -89,7 +89,7 @@ class MainActivity : AppCompatActivity() {
 
 
 
-    //여기서 오류가 나는 것 같다ㅠㅠㅠㅠ
+    //위치 가져오기 위한 권한 처리
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<String>,
@@ -107,13 +107,10 @@ class MainActivity : AppCompatActivity() {
             {
                 Toast.makeText(this, "권한이 없어 실행할 수 없습니다.", Toast.LENGTH_SHORT).show()
             }
-
         }
-
     }
 
-
-
+    //현재 위치 가져오기
     private fun getCurrentLoc() : Boolean
     {
         var result:Boolean = false
@@ -127,7 +124,6 @@ class MainActivity : AppCompatActivity() {
 
             result = true
         }
-
         /*else
         {
             latitude = 37
@@ -135,12 +131,11 @@ class MainActivity : AppCompatActivity() {
         }*/
 
         return result
-
     }
 
 
 
-    //여기서 오류가 나는 것 같다ㅠㅠㅠㅠ
+    //
     private fun getLatLang(): Location? {
 
         //
@@ -184,7 +179,6 @@ class MainActivity : AppCompatActivity() {
         }
         finish()
     }
-
 
 
 
@@ -250,9 +244,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        mediaPlayer = MediaPlayer().apply {
-            setAudioStreamType(AudioManager.STREAM_MUSIC)
-        }
 
 
         songdb = SongDatabase.songDatabase.getInstance(this@MainActivity)
@@ -283,7 +274,7 @@ class MainActivity : AppCompatActivity() {
         tv_Maintenance.setOnClickListener {
             var in_as = Intent(
                 Intent.ACTION_VIEW,
-                Uri.parse("https://sonicdutch.modoo.at/?link=bthy7r63")
+                Uri.parse("http://palmcloud.co.kr/sonicdutch/view/contact_register.html")
             )
             startActivity(in_as)
         }
@@ -333,6 +324,7 @@ class MainActivity : AppCompatActivity() {
             startActivity(in_blog)
         }
 
+
         tv_notice.setOnClickListener {
 
             var in_notice = Intent(
@@ -341,6 +333,7 @@ class MainActivity : AppCompatActivity() {
             )
             startActivity(in_notice)
         }
+
 
         iv_video.setOnClickListener {
 
@@ -368,7 +361,6 @@ class MainActivity : AppCompatActivity() {
 
 
             wb_pdf.loadUrl("https://drive.google.com/viewerng/viewer?embedded=true&url="+pdf_url)
-
 
         }
 
@@ -409,130 +401,17 @@ class MainActivity : AppCompatActivity() {
 
 
 
-        //데이터 베이스 내 노래??들을 재생
+        //데이터 베이스 내 노래 들을 재생
         tv_song.setOnClickListener {
 
-
-            //창이 닫히지 않게!!
-            //false값이 왔을 때
-            if(!getCurrentLoc())
-            {
-                return@setOnClickListener
-            }
-
-
-            Date_time()
-
-
-            var weather_key: Int? = null
-            var time_key: Int? = null
-
-            var now_sky: Float?
-            var now_pty: Float?
-            var n_s: String? = null
-            var n_p: String? = null
-
-            var song_url: String?
-
-
-            service.GetWeather(
-                1, 20, "JSON", date_now!!, time_now!!,
-                latitude.toString(), longitude.toString()
-            ).enqueue(object : Callback<WEATHER> {
-                override fun onResponse(call: Call<WEATHER>, response: Response<WEATHER>) {
-                    if (response.isSuccessful) {
-                        now_pty = response.body()!!.response.body.items.item[5].fcstValue
-                        n_p = response.body()!!.response.body.items.item[5].category
-
-                        now_sky = response.body()!!.response.body.items.item[15].fcstValue
-                        n_s = response.body()!!.response.body.items.item[15].category
-
-
-                        //데이터 베이스에서 부를 url구별을 위한 key
-                        if (now_pty!! >= 1)
-                            weather_key = 2
-                        else if (now_pty?.equals(0) ?: (0 == null) || now_sky!! <= 2)
-                            weather_key = 0
-                        else if (now_pty?.equals(0) ?: (0 == null) || now_sky!! > 2 && now_sky!! <= 4)
-                            weather_key = 1
-
-
-                        if (time!!.toInt1() >= 3 && time!!.toInt1() < 6)
-                            time_key = 0
-                        else if (time!!.toInt1() >= 6 && time!!.toInt1() < 12)
-                            time_key = 1
-                        else if (time!!.toInt1() >= 12 && time!!.toInt1() < 20)
-                            time_key = 2
-                        else if (time!!.toInt1() >= 20 && time!!.toInt1() < 3)
-                            time_key = 3
-
-
-                        //url을 받아와 플레이 재생파트.
-                        //데이터 불러오기
-                        //기본 디폴트 url = 맑은날 12시
-                        song_url = "http://kccba.net/M0003-1.mp3"
-
-                        var song: String?
-
-                        //var songdb = SongDatabase.songDatabase.getInstance(this@MainActivity)
-
-                        CoroutineScope(Dispatchers.Main).launch {
-                            var song: Songentitiy.Song = songdb.songDao().findUrl(
-                                time_key!!,
-                                weather_key!!
-                            )
-
-                            song_url = song.url
-                            Log.e("Test", song_url)
-
-
-                            try {
-
-                                if(mediaPlayer.isPlaying)
-                                {
-                                    mediaPlayer.stop()
-                                    mediaPlayer.reset()
-                                    return@launch
-
-                                }
-
-                                //미디어플레이 재생
-                                else
-                                {
-                                    mediaPlayer.setDataSource(song_url)
-
-                                    mediaPlayer.prepare()
-                                    mediaPlayer.start()
-                                    mediaPlayer.isLooping = true
-                                }
-
-                            }
-                            catch (e: Exception)
-                            {
-                                Toast.makeText(this@MainActivity,"음악을 재생할 수 없습니다. 관리자에게 문의 해주세요. ",Toast.LENGTH_SHORT).show()
-                                return@launch
-                            }
-
-
-                        }
-                    }
-
-                }
-
-                override fun onFailure(call: Call<WEATHER>, t: Throwable) {
-                    Log.d("api", t.message)
-                }
-
-            })
-
+            var in_musicplay = Intent(this, MusicPlayActivity::class.java)
+            startActivity(in_musicplay)
 
         } //버튼액션 완료
 
 
-
     }
     //oncreat 닫는
-
 
 
 }

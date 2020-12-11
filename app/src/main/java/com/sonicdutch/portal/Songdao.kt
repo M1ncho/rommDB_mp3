@@ -16,6 +16,9 @@ class Songdao {
         @Query("SELECT * FROM tb_song")
         suspend fun getAll():Array<Songentitiy.Song>
 
+        @Query("SELECT * FROM tb_song WHERE id = :id")
+        suspend fun getUrl(id: Int): Songentitiy.Song
+
 
         @Insert
         suspend fun insert(song : Songentitiy.Song)
