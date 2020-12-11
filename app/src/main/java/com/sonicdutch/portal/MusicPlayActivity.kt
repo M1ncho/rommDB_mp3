@@ -63,6 +63,13 @@ class MusicPlayActivity : AppCompatActivity() {
                         mediaPlayer.reset()
                     }
 
+                    mediaPlayer.reset()
+
+                    /*mediaPlayer = MediaPlayer().apply {
+                        setAudioStreamType(AudioManager.STREAM_MUSIC)
+                    }*/
+
+
                     start_music = position+1
 
                     layout_bottom_btn.visibility = View.VISIBLE
@@ -73,30 +80,6 @@ class MusicPlayActivity : AppCompatActivity() {
                         var choice_url = SongDatabase.songDatabase.getInstance(this@MusicPlayActivity).songDao().getUrl(start_music).url
 
                         play_song(choice_url)
-                    }
-
-
-
-                    if (mode == 1 || playnow == false)
-                    {
-
-                        Log.e("check", "모드 확인")
-
-                        start_music = position+1
-
-                        layout_bottom_btn.visibility = View.VISIBLE
-                        btn_start.visibility = View.INVISIBLE
-
-
-                        CoroutineScope(Dispatchers.Main).launch {
-                            var choice_url = SongDatabase.songDatabase.getInstance(this@MusicPlayActivity).songDao().getUrl(start_music).url
-
-                            play_song(choice_url)
-                        }
-
-                        mode = 0
-                        playnow = true
-
                     }
 
 
@@ -200,7 +183,7 @@ class MusicPlayActivity : AppCompatActivity() {
 
             else
             {
-                if(mediaPlayer.isPlaying) {
+                if (mediaPlayer.isPlaying) {
                     mediaPlayer.stop()
                     mediaPlayer.reset()
                 }
@@ -236,7 +219,7 @@ class MusicPlayActivity : AppCompatActivity() {
 
             else
             {
-                if(mediaPlayer.isPlaying) {
+                if (mediaPlayer.isPlaying) {
                     mediaPlayer.stop()
                     mediaPlayer.reset()
                 }
