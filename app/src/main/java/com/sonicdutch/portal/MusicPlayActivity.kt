@@ -4,17 +4,16 @@ import android.content.Intent
 import android.media.AudioManager
 import android.media.MediaPlayer
 import android.net.Uri
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.activity_music_play.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
 class MusicPlayActivity : AppCompatActivity() {
@@ -41,12 +40,9 @@ class MusicPlayActivity : AppCompatActivity() {
         }
 
 
-
         CoroutineScope(Dispatchers.Main).launch {
 
             list = SongDatabase.songDatabase.getInstance(this@MusicPlayActivity).songDao().getAll()
-            //song_url = SongDatabase.songDatabase.getInstance(this@MusicPlayActivity).songDao().getUrl(start_music).url
-
 
             var adapter = Music_Adapter(list!!.toList())
 
@@ -58,17 +54,17 @@ class MusicPlayActivity : AppCompatActivity() {
 
                 override fun onClick(view: View, position: Int) {
 
+                    mediaPlayer = MediaPlayer().apply {
+                        setAudioStreamType(AudioManager.STREAM_MUSIC)
+                    }
+
                     if (mediaPlayer.isPlaying) {
                         mediaPlayer.stop()
                         mediaPlayer.reset()
                     }
 
+                    //멈춘 상태에도 재시작을 하는 경우가 존재하므로 mediaplayer 인스턴스 생성
                     mediaPlayer.reset()
-
-                    /*mediaPlayer = MediaPlayer().apply {
-                        setAudioStreamType(AudioManager.STREAM_MUSIC)
-                    }*/
-
 
                     start_music = position+1
 
@@ -78,15 +74,12 @@ class MusicPlayActivity : AppCompatActivity() {
 
                     CoroutineScope(Dispatchers.Main).launch {
                         var choice_url = SongDatabase.songDatabase.getInstance(this@MusicPlayActivity).songDao().getUrl(start_music).url
-
                         play_song(choice_url)
                     }
-
 
                 }
 
             })
-
 
         }.start()
 
@@ -94,11 +87,12 @@ class MusicPlayActivity : AppCompatActivity() {
 
         imv_music_home.setOnClickListener {
 
-
-            if(mediaPlayer.isPlaying) {
+            if (mediaPlayer.isPlaying) {
                 mediaPlayer.stop()
-                mediaPlayer.reset()
                 mediaPlayer.release()
+                mode = 2
+                layout_bottom_btn.visibility = View.INVISIBLE
+                btn_start.visibility = View.VISIBLE
             }
 
             var in_home = Intent(Intent.ACTION_VIEW, Uri.parse("https://sonicdutch.modoo.at/"))
@@ -113,16 +107,28 @@ class MusicPlayActivity : AppCompatActivity() {
             btn_start.visibility = View.INVISIBLE
 
 
-
             if (start_music != 0 && mode == 1)
             {
                Log.e("check restart","$start_music")
                 mode = 0
 
+                CoroutineScope(Dispatchers.Main).launch {
+                    var restart_url = SongDatabase.songDatabase.getInstance(this@MusicPlayActivity).songDao().getUrl(start_music).url
+                    play_song(restart_url)
+                }
+            }
+
+
+            if (start_music != 0 && mode == 2)
+            {
+                mediaPlayer = MediaPlayer().apply {
+                    setAudioStreamType(AudioManager.STREAM_MUSIC)
+                }
+
+                mode = 0
 
                 CoroutineScope(Dispatchers.Main).launch {
                     var restart_url = SongDatabase.songDatabase.getInstance(this@MusicPlayActivity).songDao().getUrl(start_music).url
-
                     play_song(restart_url)
                 }
             }
@@ -133,16 +139,13 @@ class MusicPlayActivity : AppCompatActivity() {
                 mediaPlayer.start()
                 playnow = true
             }
-
         }
-
 
 
         btn_pause.setOnClickListener {
 
             layout_bottom_btn.visibility = View.INVISIBLE
             btn_start.visibility = View.VISIBLE
-
 
             if(mediaPlayer.isPlaying) {
                 mediaPlayer.pause()
@@ -156,7 +159,6 @@ class MusicPlayActivity : AppCompatActivity() {
 
             layout_bottom_btn.visibility = View.INVISIBLE
             btn_start.visibility = View.VISIBLE
-
 
             if(mediaPlayer.isPlaying) {
                 mediaPlayer.stop()
@@ -216,7 +218,6 @@ class MusicPlayActivity : AppCompatActivity() {
                 mediaPlayer.stop()
             }
 
-
             else
             {
                 if (mediaPlayer.isPlaying) {
@@ -236,9 +237,7 @@ class MusicPlayActivity : AppCompatActivity() {
 
             }
 
-
         }
-
 
     }
 
@@ -250,7 +249,6 @@ class MusicPlayActivity : AppCompatActivity() {
 
         try {
 
-            //처음 기본 음악 재생.
             mediaPlayer.setDataSource(song_play)
             mediaPlayer.prepare()
             mediaPlayer.start()
@@ -273,7 +271,6 @@ class MusicPlayActivity : AppCompatActivity() {
 
 
 
-    //다음곡 재생
     fun next_song()
     {
 
@@ -286,7 +283,7 @@ class MusicPlayActivity : AppCompatActivity() {
 
         else
         {
-            mediaPlayer.reset()
+            mediaPlayer.reset()                                             //재시작을 원할 시 reset()필수
 
             CoroutineScope(Dispatchers.Main).launch {
                 var url = SongDatabase.songDatabase.getInstance(this@MusicPlayActivity).songDao().getUrl(start_music).url
