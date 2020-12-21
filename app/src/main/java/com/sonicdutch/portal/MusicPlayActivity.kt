@@ -19,12 +19,13 @@ import kotlinx.coroutines.launch
 class MusicPlayActivity : AppCompatActivity() {
 
     var song_url: String? = null
-    var choice_number: Int? = null
+    var choice_number: String? = null
     var mode = 0
     var playnow = true
     var list : Array<Songentitiy.Song>? = null
 
     lateinit var mediaPlayer: MediaPlayer
+
 
     var start_music = 0
 
@@ -32,6 +33,11 @@ class MusicPlayActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_music_play)
+
+        song_url = intent.getStringExtra("url")
+        choice_number = intent.getStringExtra("id")
+
+        Log.e("check","$song_url  $choice_number")
 
 
 
@@ -54,13 +60,16 @@ class MusicPlayActivity : AppCompatActivity() {
 
                 override fun onClick(view: View, position: Int) {
 
-                    mediaPlayer = MediaPlayer().apply {
-                        setAudioStreamType(AudioManager.STREAM_MUSIC)
-                    }
-
                     if (mediaPlayer.isPlaying) {
                         mediaPlayer.stop()
                         mediaPlayer.reset()
+                    }
+
+                    else
+                    {
+                        mediaPlayer = MediaPlayer().apply {
+                            setAudioStreamType(AudioManager.STREAM_MUSIC)
+                        }
                     }
 
                     //멈춘 상태에도 재시작을 하는 경우가 존재하므로 mediaplayer 인스턴스 생성
@@ -82,6 +91,20 @@ class MusicPlayActivity : AppCompatActivity() {
             })
 
         }.start()
+
+
+        if (song_url != null && choice_number != null)
+        {
+            start_music = choice_number!!.toInt()
+
+            layout_bottom_btn.visibility = View.VISIBLE
+            btn_start.visibility = View.INVISIBLE
+
+            play_song(song_url!!)
+
+            Log.e("check","$start_music")
+        }
+
 
 
 

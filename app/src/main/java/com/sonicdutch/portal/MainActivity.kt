@@ -48,6 +48,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var mediaPlayer: MediaPlayer
     lateinit var songdb: SongDatabase.songDatabase
 
+
    private fun Date_time()
     {
         val cal = Calendar.getInstance()
@@ -90,11 +91,7 @@ class MainActivity : AppCompatActivity() {
 
 
     //위치 가져오기 위한 권한 처리
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<String>,
-        grantResults: IntArray
-    )
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray)
     {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if(requestCode==REQUEST_CODE)
@@ -124,21 +121,13 @@ class MainActivity : AppCompatActivity() {
 
             result = true
         }
-        /*else
-        {
-            latitude = 37
-            longitude = 126
-        }*/
 
         return result
     }
 
 
-
-    //
     private fun getLatLang(): Location? {
 
-        //
         var currentLatLng: Location? = null
         if(ActivityCompat.checkSelfPermission(applicationContext, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
             && ActivityCompat.checkSelfPermission(applicationContext, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
@@ -245,7 +234,6 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
 
-
         songdb = SongDatabase.songDatabase.getInstance(this@MainActivity)
         CoroutineScope(Dispatchers.Main).launch {
             songdb.songDao().getAll()
@@ -267,7 +255,6 @@ class MainActivity : AppCompatActivity() {
 
             var in_useway = Intent(Intent.ACTION_VIEW, Uri.parse("https://youtu.be/IptQbHSC4I0"))
             startActivity(in_useway)
-
         }
 
 
@@ -286,7 +273,6 @@ class MainActivity : AppCompatActivity() {
             )
             startActivity(in_qanswer)
         }
-
 
         tv_recipes.setOnClickListener {
             var in_recipes = Intent(
@@ -349,7 +335,6 @@ class MainActivity : AppCompatActivity() {
 
 
         tv_download.setOnClickListener {
-            
 
             wb_pdf.visibility = View.VISIBLE
             wb_pdf.apply {
@@ -361,13 +346,11 @@ class MainActivity : AppCompatActivity() {
 
 
             wb_pdf.loadUrl("https://drive.google.com/viewerng/viewer?embedded=true&url="+pdf_url)
-
         }
 
 
 
         tv_call.setOnClickListener {
-
 
             var builder = AlertDialog.Builder(this)
 
@@ -401,17 +384,95 @@ class MainActivity : AppCompatActivity() {
 
 
 
-        //데이터 베이스 내 노래 들을 재생
+        var weather_timesong: String? = null
+        var song_id: Int? = null
+
+
         tv_song.setOnClickListener {
 
-            var in_musicplay = Intent(this, MusicPlayActivity::class.java)
-            startActivity(in_musicplay)
+            if(!getCurrentLoc())
+            {
+                return@setOnClickListener
+            }
 
-        } //버튼액션 완료
+            Date_time()
+
+            var weather_key: Int? = null
+            var time_key: Int? = null
+
+            var now_sky: Float?
+            var now_pty: Float?
+            var n_s: String? = null
+            var n_p: String? = null
+
+
+            service.GetWeather(1, 20, "JSON", date_now!!, time_now!!, latitude.toString(), longitude.toString())
+                .enqueue(object : Callback<WEATHER> {
+                override fun onResponse(call: Call<WEATHER>, response: Response<WEATHER>) {
+                    if (response.isSuccessful) {
+                        now_pty = response.body()!!.response.body.items.item[5].fcstValue
+                        n_p = response.body()!!.response.body.items.item[5].category
+
+                        now_sky = response.body()!!.response.body.items.item[15].fcstValue
+                        n_s = response.body()!!.response.body.items.item[15].category
+
+
+                        //데이터 베이스에서 부를 url구별을 위한 key
+                        if (now_pty!! >= 1)
+                            weather_key = 2
+                        else if (now_pty?.equals(0) ?: (0 == null) || now_sky!! <= 2)
+                            weather_key = 0
+                        else if (now_pty?.equals(0) ?: (0 == null) || now_sky!! > 2 && now_sky!! <= 4)
+                            weather_key = 1
+
+                        if (time!!.toInt1() >= 3 && time!!.toInt1() < 6)
+                            time_key = 0
+                        else if (time!!.toInt1() >= 6 && time!!.toInt1() < 12)
+                            time_key = 1
+                        else if (time!!.toInt1() >= 12 && time!!.toInt1() < 20)
+                            time_key = 2
+                        else if (time!!.toInt1() >= 20 && time!!.toInt1() < 3)
+                            time_key = 3
+
+                        //url을 받아와 플레이 재생파트.
+                        //데이터 불러오기
+                        //기본 디폴트 url = 맑은날 12시
+                        weather_timesong = "http://kccba.net/M0003-1.mp3"
+
+                        //var songdb = SongDatabase.songDatabase.getInstance(this@MainActivity)
+                        CoroutineScope(Dispatchers.Main).launch {
+                            var song: Songentitiy.Song = songdb.songDao().findUrl(
+                                time_key!!, weather_key!!)
+
+                            var id: Songentitiy.Song = songdb.songDao().findid(
+                                time_key!!,weather_key!!)
+
+
+                            weather_timesong = song.url
+                            song_id = id.id
+
+                            Log.e("Test", "$weather_timesong  $song_id")
+
+
+                            var in_musicplay = Intent(this@MainActivity, MusicPlayActivity::class.java)
+                            in_musicplay.putExtra("url","$weather_timesong")
+                            in_musicplay.putExtra("id","${song_id.toString()}")
+
+                            startActivity(in_musicplay)
+                        }
+                    }
+                }
+
+                override fun onFailure(call: Call<WEATHER>, t: Throwable) {
+                    Log.d("api", t.message)
+                }
+
+            })
+        }
+
 
 
     }
     //oncreat 닫는
-
 
 }

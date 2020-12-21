@@ -40,7 +40,7 @@ class SongDatabase {
                         override fun onCreate(db: SupportSQLiteDatabase) {
                             super.onCreate(db)
 
-                            Log.e("api erroer", "songdb create error")
+                            Log.e("api error", "songdb create error")
 
                             CoroutineScope(Dispatchers.Main).launch {
 
@@ -58,6 +58,14 @@ class SongDatabase {
                                 getInstance(context).songDao().insert(Songentitiy.Song(10,1, 2, "http://kccba.net/sonicdutch/mp3/M0010.mp3","소닉더치 음성10"))
                                 getInstance(context).songDao().insert(Songentitiy.Song(11,2, 2, "http://kccba.net/sonicdutch/mp3/M0011.mp3","소닉더치 음성11"))
                                 getInstance(context).songDao().insert(Songentitiy.Song(12, 3, 2, "http://kccba.net/sonicdutch/mp3/M0012-2.mp3","소닉더치 음성12"))
+
+                                getInstance(context).songDao().insert(Songentitiy.Song(13,5,6,"http://kccba.netice/M0005-MAN1.mp3","소닉더치 음성13"))
+                                getInstance(context).songDao().insert(Songentitiy.Song(14,5,6,"http://kccba.netice/M0005-WOMEN3.mp3","소닉더치 음성14"))
+                                getInstance(context).songDao().insert(Songentitiy.Song(15,5,6,"http://kccba.netice/M0001-Man5.mp3","소닉더치 음성15"))
+                                getInstance(context).songDao().insert(Songentitiy.Song(16,5,6,"http://kccba.netice/M0002-WOMEN2.mp3","소닉더치 음성16"))
+                                getInstance(context).songDao().insert(Songentitiy.Song(17,5,6,"http://kccba.netice/M0012-MAN2.mp3","소닉더치 음성17"))
+                                getInstance(context).songDao().insert(Songentitiy.Song(18,5,6,"http://kccba.netice/M0012-WOMEN8.mp3","소닉더치 음성18"))
+
 
                                 Log.e("test data","songdb create end")
 

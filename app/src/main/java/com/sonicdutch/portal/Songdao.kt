@@ -19,6 +19,9 @@ class Songdao {
         @Query("SELECT * FROM tb_song WHERE id = :id")
         suspend fun getUrl(id: Int): Songentitiy.Song
 
+        @Query("SELECT * FROM tb_song WHERE time = :time_now and weather = :weather_now")
+        suspend fun findid(time_now: Int, weather_now: Int): Songentitiy.Song
+
 
         @Insert
         suspend fun insert(song : Songentitiy.Song)
