@@ -439,7 +439,6 @@ class MainActivity : AppCompatActivity() {
                         //기본 디폴트 url = 맑은날 12시
                         weather_timesong = "http://kccba.net/M0003-1.mp3"
 
-                        //var songdb = SongDatabase.songDatabase.getInstance(this@MainActivity)
                         CoroutineScope(Dispatchers.Main).launch {
                             var song: Songentitiy.Song = songdb.songDao().findUrl(
                                 time_key!!, weather_key!!)

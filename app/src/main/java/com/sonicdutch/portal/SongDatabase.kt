@@ -25,8 +25,6 @@ class SongDatabase {
 
                if(INSTANCE==null)
                {
-                   //synchronized(this){
-                       //INSTANCE=Room.databaseBuilder(context.applicationContext,songDatabase::class.java,"song.db").build() }
                    INSTANCE = buildDatabase(context)
                }
 
