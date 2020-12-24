@@ -5,13 +5,11 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationManager
-import android.media.AudioManager
 import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.TextView
 import android.widget.Toast
@@ -29,7 +27,6 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Query
-import java.io.File
 import java.util.*
 import kotlin.text.toInt as toInt1
 

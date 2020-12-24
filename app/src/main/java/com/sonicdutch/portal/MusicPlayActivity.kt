@@ -6,6 +6,7 @@ import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import android.view.MotionEvent
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -23,11 +24,14 @@ class MusicPlayActivity : AppCompatActivity() {
     var mode = 0
     var playnow = true
     var list : Array<Songentitiy.Song>? = null
+    var adapter: Music_Adapter? = null
+
+    var rv: RecyclerView? = null
 
     lateinit var mediaPlayer: MediaPlayer
 
-
     var start_music = 0
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,9 +41,6 @@ class MusicPlayActivity : AppCompatActivity() {
         song_url = intent.getStringExtra("url")
         choice_number = intent.getStringExtra("id")
 
-        Log.e("check","$song_url  $choice_number")
-
-
 
         mediaPlayer = MediaPlayer().apply {
             setAudioStreamType(AudioManager.STREAM_MUSIC)
@@ -47,35 +48,35 @@ class MusicPlayActivity : AppCompatActivity() {
 
 
         CoroutineScope(Dispatchers.Main).launch {
-
             list = SongDatabase.songDatabase.getInstance(this@MusicPlayActivity).songDao().getAll()
 
-            var adapter = Music_Adapter(list!!.toList())
+            adapter = Music_Adapter(list!!.toList())
 
-            layout_list.adapter = adapter
-            layout_list.setHasFixedSize(true)
-            layout_list.layoutManager = LinearLayoutManager(this@MusicPlayActivity,RecyclerView.VERTICAL,false)
+            rv = layout_list
 
-            adapter.setItemClickListener(object : Music_Adapter.ItemClickListener{
+            rv!!.adapter = adapter
+            rv!!.setHasFixedSize(true)
+            rv!!.layoutManager = LinearLayoutManager(this@MusicPlayActivity, RecyclerView.VERTICAL, false)
+
+            adapter!!.setItemClickListener(object : Music_Adapter.ItemClickListener{
 
                 override fun onClick(view: View, position: Int) {
+
+                    //rv!!.scrollToPosition(position)
 
                     if (mediaPlayer.isPlaying) {
                         mediaPlayer.stop()
                         mediaPlayer.reset()
                     }
 
-                    else
-                    {
+                    else {
                         mediaPlayer = MediaPlayer().apply {
                             setAudioStreamType(AudioManager.STREAM_MUSIC)
                         }
                     }
 
-                    //멈춘 상태에도 재시작을 하는 경우가 존재하므로 mediaplayer 인스턴스 생성
                     mediaPlayer.reset()
-
-                    start_music = position+1
+                    start_music = position + 1
 
                     layout_bottom_btn.visibility = View.VISIBLE
                     btn_start.visibility = View.INVISIBLE
@@ -85,12 +86,13 @@ class MusicPlayActivity : AppCompatActivity() {
                         var choice_url = SongDatabase.songDatabase.getInstance(this@MusicPlayActivity).songDao().getUrl(start_music).url
                         play_song(choice_url)
                     }
-
                 }
-
             })
 
         }.start()
+
+
+
 
 
         if (song_url != null && choice_number != null)
@@ -102,7 +104,8 @@ class MusicPlayActivity : AppCompatActivity() {
 
             play_song(song_url!!)
 
-            Log.e("check","$start_music")
+
+            Log.e("check", "$start_music")
         }
 
 
@@ -129,14 +132,15 @@ class MusicPlayActivity : AppCompatActivity() {
             layout_bottom_btn.visibility = View.VISIBLE
             btn_start.visibility = View.INVISIBLE
 
-
             if (start_music != 0 && mode == 1)
             {
-               Log.e("check restart","$start_music")
+               Log.e("check restart", "$start_music")
                 mode = 0
 
                 CoroutineScope(Dispatchers.Main).launch {
-                    var restart_url = SongDatabase.songDatabase.getInstance(this@MusicPlayActivity).songDao().getUrl(start_music).url
+                    var restart_url = SongDatabase.songDatabase.getInstance(this@MusicPlayActivity).songDao().getUrl(
+                        start_music
+                    ).url
                     play_song(restart_url)
                 }
             }
@@ -151,7 +155,9 @@ class MusicPlayActivity : AppCompatActivity() {
                 mode = 0
 
                 CoroutineScope(Dispatchers.Main).launch {
-                    var restart_url = SongDatabase.songDatabase.getInstance(this@MusicPlayActivity).songDao().getUrl(start_music).url
+                    var restart_url = SongDatabase.songDatabase.getInstance(this@MusicPlayActivity).songDao().getUrl(
+                        start_music
+                    ).url
                     play_song(restart_url)
                 }
             }
@@ -177,7 +183,6 @@ class MusicPlayActivity : AppCompatActivity() {
 
         }
 
-
         btn_stop.setOnClickListener {
 
             layout_bottom_btn.visibility = View.INVISIBLE
@@ -187,7 +192,7 @@ class MusicPlayActivity : AppCompatActivity() {
                 mediaPlayer.stop()
                 mediaPlayer.reset()
                 mode = 1
-                Log.e("check","$start_music")
+                Log.e("check", "$start_music")
             }
 
         }
@@ -198,13 +203,11 @@ class MusicPlayActivity : AppCompatActivity() {
 
             ++start_music
 
-
             if (start_music >= list!!.size)
             {
                 start_music = 1
                 mediaPlayer.stop()
             }
-
 
             else
             {
@@ -213,20 +216,22 @@ class MusicPlayActivity : AppCompatActivity() {
                     mediaPlayer.reset()
                 }
 
+                else
+                {
+                    mediaPlayer.reset()
+                }
+
+                adapter!!.fowardClick(rv!!, start_music -1)
+
+
+                mediaPlayer.reset()
                 CoroutineScope(Dispatchers.Main).launch {
-
                     var url = SongDatabase.songDatabase.getInstance(this@MusicPlayActivity).songDao().getUrl(start_music).url
-                    Log.e("check","$url")
-
                     play_song(url)
                 }
 
-                Log.e("check","$start_music")
-
+                Log.e("check", "$start_music")
             }
-
-
-
         }
 
 
@@ -248,20 +253,23 @@ class MusicPlayActivity : AppCompatActivity() {
                     mediaPlayer.reset()
                 }
 
+                else
+                {
+                    mediaPlayer.reset()
+                }
+
+                adapter!!.backClick(rv!!, start_music -1)
+
+
+                mediaPlayer.reset()
                 CoroutineScope(Dispatchers.Main).launch {
-
                     var url = SongDatabase.songDatabase.getInstance(this@MusicPlayActivity).songDao().getUrl(start_music).url
-                    Log.e("check","$url")
-
                     play_song(url)
                 }
 
-                Log.e("check","$start_music")
-
+                Log.e("check", "$start_music")
             }
-
         }
-
     }
 
 
@@ -271,25 +279,21 @@ class MusicPlayActivity : AppCompatActivity() {
     {
 
         try {
-
             mediaPlayer.setDataSource(song_play)
             mediaPlayer.prepare()
             mediaPlayer.start()
-
 
             //한 곡의 재생이 끝났을 때
             mediaPlayer.setOnCompletionListener {
                 ++start_music
                 next_song()
             }
-
         }
 
         catch (e: Exception)
         {
-            Toast.makeText(this@MusicPlayActivity,"음악을 재생할 수 없습니다. 관리자에게 문의 해주세요. ",Toast.LENGTH_SHORT).show()
+            Toast.makeText(this@MusicPlayActivity, "음악을 재생할 수 없습니다. 관리자에게 문의 해주세요. ", Toast.LENGTH_SHORT).show()
         }
-
     }
 
 
@@ -303,24 +307,20 @@ class MusicPlayActivity : AppCompatActivity() {
             mediaPlayer.stop()
         }
 
-
         else
         {
             mediaPlayer.reset()                                             //재시작을 원할 시 reset()필수
 
+            adapter!!.fowardClick(rv!!, start_music -1)
+
+
             CoroutineScope(Dispatchers.Main).launch {
                 var url = SongDatabase.songDatabase.getInstance(this@MusicPlayActivity).songDao().getUrl(start_music).url
-                Log.e("check","$url")
-
                 play_song(url)
             }
-
-            Log.e("check","$start_music")
-
+            Log.e("check", "$start_music")
         }
-
     }
-
 
 
 
