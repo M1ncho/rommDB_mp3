@@ -54,12 +54,12 @@ class SongDatabase {
                                 getInstance(context).songDao().insert(Songentitiy.Song(10,1, 2, "http://kccba.net/sonicdutch/mp3/M0010.mp3","비오는날_아침"))
                                 getInstance(context).songDao().insert(Songentitiy.Song(11,2, 2, "http://kccba.net/sonicdutch/mp3/M0011.mp3","비오는날_오후"))
                                 getInstance(context).songDao().insert(Songentitiy.Song(12, 3, 2, "http://kccba.net/sonicdutch/mp3/M0012-2.mp3","비오는날_밤"))
-                                getInstance(context).songDao().insert(Songentitiy.Song(13,5,6,"http://kccba.netice/M0005-MAN1.mp3","경쾌한 음악 배경_남성음성"))
-                                getInstance(context).songDao().insert(Songentitiy.Song(14,5,6,"http://kccba.netice/M0005-WOMEN3.mp3","경쾌한 음악 배경_여성음성"))
-                                getInstance(context).songDao().insert(Songentitiy.Song(15,5,6,"http://kccba.netice/M0001-Man5.mp3","조용한 음악 배경_남성음성"))
-                                getInstance(context).songDao().insert(Songentitiy.Song(16,5,6,"http://kccba.netice/M0002-WOMEN2.mp3","조용한 음악 배경_여성음성"))
-                                getInstance(context).songDao().insert(Songentitiy.Song(17,5,6,"http://kccba.netice/M0012-MAN2.mp3","재즈풍 음악 배경_남성음성"))
-                                getInstance(context).songDao().insert(Songentitiy.Song(18,5, 6,"http://kccba.netice/M0012-WOMEN8.mp3","재즈풍 음악 배경_여성음성"))
+                                getInstance(context).songDao().insert(Songentitiy.Song(13,5,6,"http://kccba.net/sonicdutch/mp3/M0005-MAN1.mp3","경쾌한 음악 배경_남성음성"))
+                                getInstance(context).songDao().insert(Songentitiy.Song(14,5,6,"http://kccba.net/sonicdutch/mp3/M0005-WOMEN3.mp3","경쾌한 음악 배경_여성음성"))
+                                getInstance(context).songDao().insert(Songentitiy.Song(15,5,6,"http://kccba.net/sonicdutch/mp3/M0001-Man5.mp3","조용한 음악 배경_남성음성"))
+                                getInstance(context).songDao().insert(Songentitiy.Song(16,5,6,"http://kccba.net/sonicdutch/mp3/M0002-WOMEN2.mp3","조용한 음악 배경_여성음성"))
+                                getInstance(context).songDao().insert(Songentitiy.Song(17,5,6,"http://kccba.net/sonicdutch/mp3/M0012-MAN2.mp3","재즈풍 음악 배경_남성음성"))
+                                getInstance(context).songDao().insert(Songentitiy.Song(18,5, 6,"http://kccba.net/sonicdutch/mp3/M0012-WOMEN8.mp3","재즈풍 음악 배경_여성음성"))
 
                                 Log.e("test data","songdb create end")
 
