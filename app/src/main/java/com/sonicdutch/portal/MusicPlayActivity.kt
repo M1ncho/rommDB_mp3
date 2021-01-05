@@ -240,7 +240,7 @@ class MusicPlayActivity : AppCompatActivity() {
 
                 rv!!.smoothSnapToPosition(start_music-2)
 
-                adapter!!.fowardClick(rv!!, start_music-1)
+                adapter!!.choiceClick(rv!!, start_music-1)
 
                 mediaPlayer.reset()
                 CoroutineScope(Dispatchers.Main).launch {
@@ -264,7 +264,7 @@ class MusicPlayActivity : AppCompatActivity() {
             else if (start_music == 1) {
                 mediaPlayer.reset()
                 rv!!.smoothSnapToPosition(start_music-1)
-                adapter!!.backClick(rv!!, start_music-1)
+                adapter!!.choiceClick(rv!!, start_music-1)
 
                 CoroutineScope(Dispatchers.Main).launch {
                     var url = SongDatabase.songDatabase.getInstance(this@MusicPlayActivity).songDao().getUrl(start_music).url
@@ -288,7 +288,7 @@ class MusicPlayActivity : AppCompatActivity() {
 
                 rv!!.smoothSnapToPosition(start_music-2)
 
-                adapter!!.backClick(rv!!, start_music-1)
+                adapter!!.choiceClick(rv!!, start_music-1)
 
                 mediaPlayer.reset()
                 CoroutineScope(Dispatchers.Main).launch {
@@ -342,7 +342,7 @@ class MusicPlayActivity : AppCompatActivity() {
         {
             mediaPlayer.reset()                                             //재시작을 원할 시 reset()필수
 
-            adapter!!.fowardClick(rv!!, start_music -1)
+            adapter!!.choiceClick(rv!!, start_music -1)
             rv!!.smoothSnapToPosition(start_music)
 
             CoroutineScope(Dispatchers.Main).launch {

@@ -74,51 +74,6 @@ class Music_Adapter(private var songs: List<Songentitiy.Song>) : RecyclerView.Ad
 
 
     //임의로 포지션 바꾸기?
-    fun fowardClick(view: RecyclerView, position: Int) {
-        var foward = position
-
-        mPosition = foward
-
-        if (mPosition == position)
-        {
-            var nextview= view.layoutManager!!.findViewByPosition(foward)
-            nextview!!.setBackgroundColor(Color.GRAY)
-        }
-
-        else
-        {
-            var views = view.layoutManager!!.findViewByPosition(position)
-            views!!.setBackgroundColor(Color.WHITE)
-        }
-
-        notifyDataSetChanged()
-
-    }
-
-
-
-    fun backClick(view: RecyclerView, position: Int) {
-        var back = position
-
-        mPosition = back
-
-        if (mPosition == position)
-        {
-            var backviews = view.layoutManager?.findViewByPosition(back)
-            backviews!!.setBackgroundColor(Color.GRAY)
-        }
-
-        else
-        {
-            var views = view.layoutManager?.findViewByPosition(position)
-            views!!.setBackgroundColor(Color.WHITE)
-        }
-
-        notifyDataSetChanged()
-    }
-
-
-
     fun choiceClick(view: RecyclerView, position: Int) {
 
         var choice = position
@@ -138,8 +93,6 @@ class Music_Adapter(private var songs: List<Songentitiy.Song>) : RecyclerView.Ad
 
         notifyDataSetChanged()
     }
-
-
 
 
 
