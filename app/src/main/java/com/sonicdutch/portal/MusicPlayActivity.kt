@@ -153,7 +153,7 @@ class MusicPlayActivity : AppCompatActivity() {
 
             if (start_music != 0 && mode == 1)
             {
-               Log.e("check restart", "$start_music")
+               //Log.e("check restart", "$start_music")
                 mode = 0
 
                 CoroutineScope(Dispatchers.Main).launch {
@@ -167,9 +167,7 @@ class MusicPlayActivity : AppCompatActivity() {
 
             if (start_music != 0 && mode == 2)
             {
-                mediaPlayer = MediaPlayer().apply {
-                    setAudioStreamType(AudioManager.STREAM_MUSIC)
-                }
+                mediaPlayer.reset()
 
                 mode = 0
 
@@ -369,15 +367,27 @@ class MusicPlayActivity : AppCompatActivity() {
 
 
 
+
     override fun onDestroy() {
-        super.onDestroy()
-        if(mediaPlayer.isPlaying)
-        {
+
+        if (mediaPlayer.isPlaying) {
             mediaPlayer.stop()
             mediaPlayer.release()
         }
-        finish()
+        super.onDestroy()
     }
+
+
+
+    override fun onResume() {
+        super.onResume()
+        mediaPlayer = MediaPlayer().apply {
+            setAudioStreamType(AudioManager.STREAM_MUSIC)
+        }
+    }
+
+
+
 
 
 

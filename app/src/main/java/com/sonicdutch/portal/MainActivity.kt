@@ -194,7 +194,6 @@ class MainActivity : AppCompatActivity() {
         .build()
 
 
-
     //날씨검사. api활용하여 gson으로 파싱? 데이터 확인. (retrofit 사용)
     interface WeatherInterface
     {
@@ -218,7 +217,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
 
         songdb = SongDatabase.songDatabase.getInstance(this@MainActivity)
         CoroutineScope(Dispatchers.Main).launch {
@@ -292,7 +290,6 @@ class MainActivity : AppCompatActivity() {
 
 
         tv_notice.setOnClickListener {
-
             var in_notice = Intent(
                 Intent.ACTION_VIEW,
                 Uri.parse("https://sonicdutch.modoo.at/?link=3x3fk95u")
@@ -316,8 +313,6 @@ class MainActivity : AppCompatActivity() {
                 webViewClient = WebViewClient()
             }
             val pdf_url = "http://www.kccba.net/sonicdutch/manual.pdf"
-            //val test = "http://blifestore.com/download/manual.pdf"
-
 
             wb_pdf.loadUrl("https://drive.google.com/viewerng/viewer?embedded=true&url="+pdf_url)
         }
@@ -408,8 +403,7 @@ class MainActivity : AppCompatActivity() {
                         else if (time!!.toInt1() >= 20 && time!!.toInt1() < 3)
                             time_key = 3
 
-                        //url을 받아와 플레이 재생파트.
-                        //데이터 불러오기
+
                         //기본 디폴트 url = 맑은날 12시
                         weather_timesong = "http://kccba.net/M0003-1.mp3"
 
@@ -450,12 +444,12 @@ class MainActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
 
-        if(System.currentTimeMillis() - backPressedTime >=2000 ) {
+        if(System.currentTimeMillis() - backPressedTime >=1000 ) {
             wb_pdf.visibility = View.INVISIBLE
             backPressedTime = System.currentTimeMillis()
         }
         else {
-            finish() //액티비티 종료
+            finish()
         }
     }
 

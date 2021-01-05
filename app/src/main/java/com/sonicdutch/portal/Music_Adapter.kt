@@ -21,9 +21,6 @@ class Music_Adapter(private var songs: List<Songentitiy.Song>) : RecyclerView.Ad
     var list = ArrayList<Selection>()
     var mPosition = -1
 
-    var start_music = 0
-    lateinit var mediaPlayer: MediaPlayer
-
 
     class MyViewHolder(itemview: View) : RecyclerView.ViewHolder(itemview)
     {

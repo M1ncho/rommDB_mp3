@@ -68,8 +68,6 @@ class SongDatabase {
 
                         }
 
-                        //onopen을 써바?
-
                     }).build()
             }
         }
