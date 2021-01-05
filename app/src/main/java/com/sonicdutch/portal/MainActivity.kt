@@ -9,6 +9,7 @@ import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import android.view.KeyEvent
 import android.view.View
 import android.webkit.WebViewClient
 import android.widget.TextView
@@ -42,8 +43,9 @@ class MainActivity : AppCompatActivity() {
     var date_now: String?= null
     var time_now: String? = null
 
-    lateinit var mediaPlayer: MediaPlayer
+
     lateinit var songdb: SongDatabase.songDatabase
+    private var backPressedTime : Long = 0
 
 
    private fun Date_time()
@@ -155,19 +157,6 @@ class MainActivity : AppCompatActivity() {
 
 
 
-
-    override fun onDestroy() {
-        super.onDestroy()
-        if(mediaPlayer.isPlaying)
-        {
-            mediaPlayer.stop()
-            mediaPlayer.release()
-        }
-        finish()
-    }
-
-
-
     data class WEATHER(
         val response: RESPONSE
     )
@@ -244,12 +233,6 @@ class MainActivity : AppCompatActivity() {
 
         tv_way.setOnClickListener {
 
-            if(mediaPlayer.isPlaying)
-            {
-                mediaPlayer.stop()
-                mediaPlayer.release()
-            }
-
             var in_useway = Intent(Intent.ACTION_VIEW, Uri.parse("https://youtu.be/IptQbHSC4I0"))
             startActivity(in_useway)
         }
@@ -319,12 +302,6 @@ class MainActivity : AppCompatActivity() {
 
 
         iv_video.setOnClickListener {
-
-            if(mediaPlayer.isPlaying)
-            {
-                mediaPlayer.stop()
-                mediaPlayer.release()
-            }
 
             var in_video = Intent(Intent.ACTION_VIEW, Uri.parse("https://youtu.be/z_3FokLgjT4"))
             startActivity(in_video)
@@ -466,9 +443,21 @@ class MainActivity : AppCompatActivity() {
             })
         }
 
-
-
     }
     //oncreat 닫는
+
+
+
+    override fun onBackPressed() {
+
+        if(System.currentTimeMillis() - backPressedTime >=2000 ) {
+            wb_pdf.visibility = View.INVISIBLE
+            backPressedTime = System.currentTimeMillis()
+        }
+        else {
+            finish() //액티비티 종료
+        }
+    }
+
 
 }

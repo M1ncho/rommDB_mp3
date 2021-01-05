@@ -54,7 +54,6 @@ class SongDatabase {
                                 getInstance(context).songDao().insert(Songentitiy.Song(10,1, 2, "http://kccba.net/sonicdutch/mp3/M0010.mp3","비오는날_아침"))
                                 getInstance(context).songDao().insert(Songentitiy.Song(11,2, 2, "http://kccba.net/sonicdutch/mp3/M0011.mp3","비오는날_오후"))
                                 getInstance(context).songDao().insert(Songentitiy.Song(12, 3, 2, "http://kccba.net/sonicdutch/mp3/M0012-2.mp3","비오는날_밤"))
-
                                 getInstance(context).songDao().insert(Songentitiy.Song(13,5,6,"http://kccba.netice/M0005-MAN1.mp3","경쾌한 음악 배경_남성음성"))
                                 getInstance(context).songDao().insert(Songentitiy.Song(14,5,6,"http://kccba.netice/M0005-WOMEN3.mp3","경쾌한 음악 배경_여성음성"))
                                 getInstance(context).songDao().insert(Songentitiy.Song(15,5,6,"http://kccba.netice/M0001-Man5.mp3","조용한 음악 배경_남성음성"))

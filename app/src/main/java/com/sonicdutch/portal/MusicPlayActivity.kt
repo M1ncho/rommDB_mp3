@@ -1,6 +1,8 @@
 package com.sonicdutch.portal
 
+import android.content.Context
 import android.content.Intent
+import android.graphics.PointF
 import android.media.AudioManager
 import android.media.MediaPlayer
 import android.net.Uri
@@ -8,9 +10,11 @@ import android.os.Bundle
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewTreeObserver
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.activity_music_play.*
 import kotlinx.coroutines.CoroutineScope
@@ -31,7 +35,6 @@ class MusicPlayActivity : AppCompatActivity() {
     lateinit var mediaPlayer: MediaPlayer
 
     var start_music = 0
-
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -58,11 +61,49 @@ class MusicPlayActivity : AppCompatActivity() {
             rv!!.setHasFixedSize(true)
             rv!!.layoutManager = LinearLayoutManager(this@MusicPlayActivity, RecyclerView.VERTICAL, false)
 
+
+            rv!!.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener{
+                override fun onGlobalLayout() {
+
+                    start_music = choice_number!!.toInt()
+
+                    layout_bottom_btn.visibility = View.VISIBLE
+                    btn_start.visibility = View.INVISIBLE
+                    play_song(song_url!!)
+
+
+                    if (start_music == 1) {
+                        rv!!.smoothSnapToPosition(start_music-1)
+                    }
+                    else {
+                        rv!!.smoothSnapToPosition(start_music-2)
+                    }
+
+
+                    try
+                    {
+                        adapter!!.choiceClick( rv!!,start_music-1)
+                    }
+                    catch (e: Exception) {
+                        Log.e("notice","$e")
+                    }
+
+                    rv!!.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                }
+            })
+
+
             adapter!!.setItemClickListener(object : Music_Adapter.ItemClickListener{
 
                 override fun onClick(view: View, position: Int) {
 
-                    //rv!!.scrollToPosition(position)
+                    if (position == 0) {
+                        rv!!.smoothSnapToPosition(position)
+                    }
+                    else {
+                        rv!!.smoothSnapToPosition(position-1)
+                    }
+
 
                     if (mediaPlayer.isPlaying) {
                         mediaPlayer.stop()
@@ -70,9 +111,7 @@ class MusicPlayActivity : AppCompatActivity() {
                     }
 
                     else {
-                        mediaPlayer = MediaPlayer().apply {
-                            setAudioStreamType(AudioManager.STREAM_MUSIC)
-                        }
+                        mediaPlayer.reset()
                     }
 
                     mediaPlayer.reset()
@@ -81,33 +120,13 @@ class MusicPlayActivity : AppCompatActivity() {
                     layout_bottom_btn.visibility = View.VISIBLE
                     btn_start.visibility = View.INVISIBLE
 
-
                     CoroutineScope(Dispatchers.Main).launch {
                         var choice_url = SongDatabase.songDatabase.getInstance(this@MusicPlayActivity).songDao().getUrl(start_music).url
                         play_song(choice_url)
                     }
                 }
             })
-
         }.start()
-
-
-
-
-
-        if (song_url != null && choice_number != null)
-        {
-            start_music = choice_number!!.toInt()
-
-            layout_bottom_btn.visibility = View.VISIBLE
-            btn_start.visibility = View.INVISIBLE
-
-            play_song(song_url!!)
-
-
-            Log.e("check", "$start_music")
-        }
-
 
 
 
@@ -180,8 +199,8 @@ class MusicPlayActivity : AppCompatActivity() {
                 mediaPlayer.pause()
                 playnow = false
             }
-
         }
+
 
         btn_stop.setOnClickListener {
 
@@ -194,23 +213,21 @@ class MusicPlayActivity : AppCompatActivity() {
                 mode = 1
                 Log.e("check", "$start_music")
             }
-
         }
 
 
 
         btn_foward.setOnClickListener {
-
             ++start_music
 
-            if (start_music >= list!!.size)
-            {
+            if (start_music >= list!!.size) {
                 start_music = 1
                 mediaPlayer.stop()
+                rv!!.smoothSnapToPosition(start_music-1)
             }
 
-            else
-            {
+            else {
+
                 if (mediaPlayer.isPlaying) {
                     mediaPlayer.stop()
                     mediaPlayer.reset()
@@ -218,36 +235,47 @@ class MusicPlayActivity : AppCompatActivity() {
 
                 else
                 {
+                    layout_bottom_btn.visibility = View.VISIBLE
+                    btn_start.visibility = View.INVISIBLE
                     mediaPlayer.reset()
                 }
 
-                adapter!!.fowardClick(rv!!, start_music -1)
+                rv!!.smoothSnapToPosition(start_music-2)
 
+                adapter!!.fowardClick(rv!!, start_music-1)
 
                 mediaPlayer.reset()
                 CoroutineScope(Dispatchers.Main).launch {
                     var url = SongDatabase.songDatabase.getInstance(this@MusicPlayActivity).songDao().getUrl(start_music).url
                     play_song(url)
                 }
-
-                Log.e("check", "$start_music")
             }
         }
 
 
 
         btn_back.setOnClickListener {
-
             --start_music
 
-            if (start_music == 0)
-            {
+            if (start_music == 0) {
                 start_music = 1
                 mediaPlayer.stop()
+                rv!!.smoothSnapToPosition(start_music-1)
             }
 
-            else
-            {
+            else if (start_music == 1) {
+                mediaPlayer.reset()
+                rv!!.smoothSnapToPosition(start_music-1)
+                adapter!!.backClick(rv!!, start_music-1)
+
+                CoroutineScope(Dispatchers.Main).launch {
+                    var url = SongDatabase.songDatabase.getInstance(this@MusicPlayActivity).songDao().getUrl(start_music).url
+                    play_song(url)
+                }
+            }
+
+            else {
+
                 if (mediaPlayer.isPlaying) {
                     mediaPlayer.stop()
                     mediaPlayer.reset()
@@ -255,11 +283,14 @@ class MusicPlayActivity : AppCompatActivity() {
 
                 else
                 {
+                    layout_bottom_btn.visibility = View.VISIBLE
+                    btn_start.visibility = View.INVISIBLE
                     mediaPlayer.reset()
                 }
 
-                adapter!!.backClick(rv!!, start_music -1)
+                rv!!.smoothSnapToPosition(start_music-2)
 
+                adapter!!.backClick(rv!!, start_music-1)
 
                 mediaPlayer.reset()
                 CoroutineScope(Dispatchers.Main).launch {
@@ -267,7 +298,6 @@ class MusicPlayActivity : AppCompatActivity() {
                     play_song(url)
                 }
 
-                Log.e("check", "$start_music")
             }
         }
     }
@@ -283,6 +313,7 @@ class MusicPlayActivity : AppCompatActivity() {
             mediaPlayer.prepare()
             mediaPlayer.start()
 
+
             //한 곡의 재생이 끝났을 때
             mediaPlayer.setOnCompletionListener {
                 ++start_music
@@ -293,6 +324,7 @@ class MusicPlayActivity : AppCompatActivity() {
         catch (e: Exception)
         {
             Toast.makeText(this@MusicPlayActivity, "음악을 재생할 수 없습니다. 관리자에게 문의 해주세요. ", Toast.LENGTH_SHORT).show()
+            Log.e("error song","$e")
         }
     }
 
@@ -305,6 +337,7 @@ class MusicPlayActivity : AppCompatActivity() {
         {
             start_music = 1
             mediaPlayer.stop()
+            rv!!.smoothSnapToPosition(start_music-1)
         }
 
         else
@@ -312,7 +345,7 @@ class MusicPlayActivity : AppCompatActivity() {
             mediaPlayer.reset()                                             //재시작을 원할 시 reset()필수
 
             adapter!!.fowardClick(rv!!, start_music -1)
-
+            rv!!.smoothSnapToPosition(start_music)
 
             CoroutineScope(Dispatchers.Main).launch {
                 var url = SongDatabase.songDatabase.getInstance(this@MusicPlayActivity).songDao().getUrl(start_music).url
@@ -320,6 +353,30 @@ class MusicPlayActivity : AppCompatActivity() {
             }
             Log.e("check", "$start_music")
         }
+    }
+
+
+
+
+    fun RecyclerView.smoothSnapToPosition(position: Int, snapMode: Int = LinearSmoothScroller.SNAP_TO_START) {
+        val smoothScroller = object : LinearSmoothScroller(this.context) {
+            override fun getVerticalSnapPreference(): Int = snapMode
+            override fun getHorizontalSnapPreference(): Int = snapMode
+        }
+        smoothScroller.targetPosition = position
+        layoutManager?.startSmoothScroll(smoothScroller)
+    }
+
+
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if(mediaPlayer.isPlaying)
+        {
+            mediaPlayer.stop()
+            mediaPlayer.release()
+        }
+        finish()
     }
 
 

@@ -5,6 +5,7 @@ import android.graphics.Color
 import android.media.AudioManager
 import android.media.MediaPlayer
 import android.text.Selection
+import android.util.Log
 import android.view.*
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
@@ -61,6 +62,7 @@ class Music_Adapter(private var songs: List<Songentitiy.Song>) : RecyclerView.Ad
         holder.itemView.setOnClickListener {
             mPosition = position
             itemClickListner.onClick(it, position)
+
             notifyDataSetChanged()
         }
 
@@ -82,13 +84,13 @@ class Music_Adapter(private var songs: List<Songentitiy.Song>) : RecyclerView.Ad
 
         if (mPosition == position)
         {
-            var nextview= view.layoutManager?.findViewByPosition(foward)
+            var nextview= view.layoutManager!!.findViewByPosition(foward)
             nextview!!.setBackgroundColor(Color.GRAY)
         }
 
         else
         {
-            var views = view.layoutManager?.findViewByPosition(position)
+            var views = view.layoutManager!!.findViewByPosition(position)
             views!!.setBackgroundColor(Color.WHITE)
         }
 
@@ -120,25 +122,24 @@ class Music_Adapter(private var songs: List<Songentitiy.Song>) : RecyclerView.Ad
 
 
 
+    fun choiceClick(view: RecyclerView, position: Int) {
 
-    fun nowclick(view: RecyclerView, position: Int) {
-
-        mPosition = position
+        var choice = position
+        mPosition = choice
 
         if (mPosition == position)
         {
-            var backviews = view.layoutManager?.findViewByPosition(mPosition)
-            backviews!!.setBackgroundColor(Color.GRAY)
+            var choiceviews = view.layoutManager!!.findViewByPosition(choice)
+            choiceviews!!.setBackgroundColor(Color.GRAY)
         }
 
         else
         {
-            var views = view.layoutManager?.findViewByPosition(position)
+            var views = view.layoutManager!!.findViewByPosition(position)
             views!!.setBackgroundColor(Color.WHITE)
         }
 
         notifyDataSetChanged()
-
     }
 
 
@@ -162,6 +163,7 @@ class Music_Adapter(private var songs: List<Songentitiy.Song>) : RecyclerView.Ad
     }
 
 
-    
+
 }
+
 
