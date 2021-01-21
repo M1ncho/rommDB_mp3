@@ -239,7 +239,7 @@ class MainActivity : AppCompatActivity() {
         tv_Maintenance.setOnClickListener {
             var in_as = Intent(
                 Intent.ACTION_VIEW,
-                Uri.parse("http://palmcloud.co.kr/sonicdutch/view/contact_register.html")
+                Uri.parse("https://sonicdutch.modoo.at/?link=bthy7r63")
             )
             startActivity(in_as)
         }
