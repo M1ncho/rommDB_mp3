@@ -73,7 +73,7 @@ class Music_Adapter(private var songs: List<Songentitiy.Song>) : RecyclerView.Ad
 
 
 
-    //임의로 포지션 바꾸기?
+    //임의로 포지션 바꾸기
     fun choiceClick(view: RecyclerView, position: Int) {
 
         var choice = position

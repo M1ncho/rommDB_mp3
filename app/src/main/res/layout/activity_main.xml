@@ -123,7 +123,6 @@
                 android:paddingTop="35dp"
                 android:id="@+id/tv_way"
                 android:background="@color/way_color"
-
                 android:layout_marginRight="10dp"
                 />
 

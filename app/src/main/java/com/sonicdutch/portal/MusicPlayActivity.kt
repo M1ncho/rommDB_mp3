@@ -295,7 +295,6 @@ class MusicPlayActivity : AppCompatActivity() {
                     var url = SongDatabase.songDatabase.getInstance(this@MusicPlayActivity).songDao().getUrl(start_music).url
                     play_song(url)
                 }
-
             }
         }
     }
@@ -305,7 +304,6 @@ class MusicPlayActivity : AppCompatActivity() {
 
     fun play_song(song_play: String)
     {
-
         try {
             mediaPlayer.setDataSource(song_play)
             mediaPlayer.prepare()
