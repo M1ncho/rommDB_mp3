@@ -3,6 +3,7 @@ import androidx.room.*
 
 class Songentitiy {
 
+    // database name
     @Entity(tableName = "tb_song")
 
     data class Song(

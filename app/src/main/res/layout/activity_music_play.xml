@@ -8,13 +8,6 @@
     tools:context=".MusicPlayActivity">
 
 
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:src="@drawable/music_main"
-        />
-
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="40dp"
@@ -26,29 +19,9 @@
         android:layout_marginTop="15dp"
         android:id="@+id/layout_music_top">
 
-        <ImageView
-            android:layout_width="180dp"
-            android:layout_height="25dp"
-            android:src="@drawable/logo_icon2"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            />
-
-
-        <ImageView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@drawable/home_icon2"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            android:layout_marginRight="11dp"
-            android:id="@+id/imv_music_home"
-            />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
 
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -76,21 +49,9 @@
                 android:textColor="@color/playlist_color"
                 android:textSize="14sp"
                 android:layout_marginLeft="18dp"
-                android:id="@+id/tv_playylist"
-                />
-
-
-            <ImageView
-                android:layout_width="17dp"
-                android:layout_height="20dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/tv_playylist"
-                android:src="@drawable/playlist_icon"
-                android:layout_marginLeft="13dp"
-                />
+                android:id="@+id/tv_playylist"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
-
 
 
         <androidx.recyclerview.widget.RecyclerView
@@ -107,8 +68,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="100dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        >
+        app:layout_constraintBottom_toBottomOf="parent">
 
         <ImageButton
             android:layout_width="wrap_content"
@@ -119,9 +79,7 @@
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             android:src="@drawable/start_icon"
-            android:id="@+id/btn_start"
-            />
-
+            android:id="@+id/btn_start"/>
 
 
         <LinearLayout
@@ -133,8 +91,7 @@
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             android:id="@+id/layout_bottom_btn"
-            android:visibility="gone"
-            >
+            android:visibility="gone">
 
             <ImageButton
                 android:layout_width="wrap_content"
@@ -142,8 +99,7 @@
                 android:background="@color/music_main_color"
                 android:layout_weight="1"
                 android:src="@drawable/pause_icon"
-                android:id="@+id/btn_pause"
-                />
+                android:id="@+id/btn_pause"/>
 
 
             <ImageButton
@@ -153,12 +109,9 @@
                 android:layout_weight="1"
                 android:layout_marginLeft="20dp"
                 android:src="@drawable/stop_icon"
-                android:id="@+id/btn_stop"
-                />
+                android:id="@+id/btn_stop"/>
 
         </LinearLayout>
-
-
 
 
 
@@ -171,8 +124,7 @@
             app:layout_constraintLeft_toRightOf="@+id/btn_start"
             android:layout_marginLeft="60dp"
             android:src="@drawable/foward_icon"
-            android:id="@+id/btn_foward"
-            />
+            android:id="@+id/btn_foward"/>
 
 
         <ImageButton
@@ -184,12 +136,9 @@
             app:layout_constraintRight_toLeftOf="@+id/btn_start"
             android:layout_marginRight="60dp"
             android:src="@drawable/back_icon"
-            android:id="@+id/btn_back"
-            />
-
+            android:id="@+id/btn_back"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

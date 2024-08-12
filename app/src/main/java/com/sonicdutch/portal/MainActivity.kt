@@ -66,14 +66,11 @@ class MainActivity : AppCompatActivity() {
     val YO = 136          // 기준점 y좌표
 
 
-
-
     //현 위치
     var locationmanger : LocationManager? = null
     val REQUEST_CODE : Int = 2
     var latitude : Double? = null
     var longitude : Double? =null
-    //var currentLatLng: Location? = null
 
 
     //위치 가져오기 위한 권한 처리
@@ -92,8 +89,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
-
 
 
 
@@ -151,7 +146,7 @@ class MainActivity : AppCompatActivity() {
 
 
 
-
+    // 날씨를 받아오기 위한 data class
     data class WEATHER(
         val response: RESPONSE
     )
@@ -181,8 +176,7 @@ class MainActivity : AppCompatActivity() {
     )
 
 
-
-
+    // retrofit 선언
     private val retrofit = Retrofit.Builder()
         .baseUrl("http://apis.data.go.kr/")
         .addConverterFactory(GsonConverterFactory.create(gson))
@@ -210,162 +204,27 @@ class MainActivity : AppCompatActivity() {
 
 
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        // db 생성 관련
         songdb = SongDatabase.songDatabase.getInstance(this@MainActivity)
         CoroutineScope(Dispatchers.Main).launch {
             songdb.songDao().getAll()
         }
 
 
+        // 현재 위치 가져오기
         getLatLang()
         getCurrentLoc()
-
-
-
-
-
-
-        tv_home.setOnClickListener {
-            var in_home = Intent(Intent.ACTION_VIEW, Uri.parse("https://sonicdutch.modoo.at/"))
-            startActivity(in_home)
-        }
-
-        tv_way.setOnClickListener {
-
-            var in_useway = Intent(Intent.ACTION_VIEW, Uri.parse("https://youtu.be/IptQbHSC4I0"))
-            startActivity(in_useway)
-        }
-
-
-        tv_Maintenance.setOnClickListener {
-            var in_as = Intent(
-                Intent.ACTION_VIEW,
-                Uri.parse("https://sonicdutch.modoo.at/?link=bthy7r63")
-            )
-            startActivity(in_as)
-        }
-
-        tv_q_an.setOnClickListener {
-            var in_qanswer = Intent(
-                Intent.ACTION_VIEW,
-                Uri.parse("https://sonicdutch.modoo.at/?link=aa5s09di")
-            )
-            startActivity(in_qanswer)
-        }
-
-        tv_recipes.setOnClickListener {
-            var in_recipes = Intent(
-                Intent.ACTION_VIEW,
-                Uri.parse("https://sonicdutch.modoo.at/?link=bv2huhtg")
-            )
-            startActivity(in_recipes)
-        }
-
-
-        iv_face.setOnClickListener {
-            var in_face = Intent(
-                Intent.ACTION_VIEW,
-                Uri.parse("https://www.facebook.com/soniccoldbrew")
-            )
-            startActivity(in_face)
-        }
-
-        iv_instar.setOnClickListener {
-            var in_instar = Intent(
-                Intent.ACTION_VIEW,
-                Uri.parse("https://www.instagram.com/sonicdutch")
-            )
-            startActivity(in_instar)
-        }
-
-
-        iv_kakao.setOnClickListener {
-            var in_kakao = Intent(Intent.ACTION_VIEW, Uri.parse("https://pf.kakao.com/_tiMxlxl"))
-            startActivity(in_kakao)
-        }
-
-        iv_blog.setOnClickListener {
-            var in_blog = Intent(Intent.ACTION_VIEW, Uri.parse("https://blog.naver.com/sonicdutch"))
-            startActivity(in_blog)
-        }
-
-
-        tv_notice.setOnClickListener {
-            var in_notice = Intent(
-                Intent.ACTION_VIEW,
-                Uri.parse("https://sonicdutch.modoo.at/?link=3x3fk95u")
-            )
-            startActivity(in_notice)
-        }
-
-
-        iv_video.setOnClickListener {
-
-            var in_video = Intent(Intent.ACTION_VIEW, Uri.parse("https://youtu.be/z_3FokLgjT4"))
-            startActivity(in_video)
-        }
-
-
-        tv_download.setOnClickListener {
-
-            wb_pdf.visibility = View.VISIBLE
-            wb_pdf.apply {
-                settings.javaScriptEnabled = true
-                webViewClient = WebViewClient()
-            }
-            val pdf_url = "http://www.kccba.net/sonicdutch/manual.pdf"
-
-            wb_pdf.loadUrl("https://drive.google.com/viewerng/viewer?embedded=true&url="+pdf_url)
-        }
-
-
-
-        tv_call.setOnClickListener {
-
-            var builder = AlertDialog.Builder(this)
-
-
-            var poplayout = layoutInflater.inflate(R.layout.popup_menu, null)
-
-            var call_tv : TextView=poplayout.findViewById(R.id.tv_as_call)
-            var send_tv : TextView=poplayout.findViewById(R.id.tv_as_send)
-            builder.setView(poplayout)
-            var dialog: AlertDialog = builder.create()
-
-
-            call_tv.setOnClickListener {
-
-                val num = Uri.parse("tel:010-7233-0754")
-                var callintent = Intent(Intent.ACTION_DIAL, num)                //전화 창으로만 가도록
-                startActivity(callintent)
-                dialog.dismiss()
-            }
-
-            send_tv.setOnClickListener {
-
-                val magnum = Uri.parse("sms:010-7233-0754")        //문자창으로만 이동
-                var magintent = Intent(Intent.ACTION_SENDTO, magnum)
-                startActivity(magintent)
-                dialog.dismiss()
-            }
-
-            dialog.show()
-        }
-
 
 
         var weather_timesong: String? = null
         var song_id: Int? = null
 
 
-        tv_song.setOnClickListener {
-
-            Log.d("CLICK NOW ", "CHECK")
-
+        btn_move.setOnClickListener {
             var Degrad = Math.PI / 180.0
             var Raddeg = 180.0 / Math.PI
 
@@ -422,7 +281,6 @@ class MainActivity : AppCompatActivity() {
             var now_time = String.format("%02d", time) + "00"
 
 
-
             //날씨 api 호출
             service.GetWeather(open_decoding, 1, 9, "JSON", formattedDate, now_time, x_long.toString(), y_lat.toString())
                 .enqueue(object : Callback<WEATHER> {
@@ -463,7 +321,6 @@ class MainActivity : AppCompatActivity() {
                             time_key = 3
 
 
-
                         //기본 디폴트 url = 맑은날 12시
                         weather_timesong = "http://kccba.net/M0003-1.mp3"
 
@@ -479,8 +336,6 @@ class MainActivity : AppCompatActivity() {
                             weather_timesong = song.url
                             song_id = id.id
 
-                            //Log.e("Test", "$weather_timesong  $song_id")
-
                             var in_musicplay = Intent(this@MainActivity, MusicPlayActivity::class.java)
                             in_musicplay.putExtra("url","$weather_timesong")
                             in_musicplay.putExtra("id","${song_id.toString()}")
@@ -488,7 +343,6 @@ class MainActivity : AppCompatActivity() {
                             startActivity(in_musicplay)
                         }
                     }
-
 
                     else {
                         weather_key = 0
@@ -514,8 +368,6 @@ class MainActivity : AppCompatActivity() {
                             startActivity(in_musicplay)
                         }
                     }
-
-
                 }
                 override fun onFailure(call: Call<WEATHER>, t: Throwable) {
                     Log.d("api ", "${t.message}")
@@ -523,15 +375,10 @@ class MainActivity : AppCompatActivity() {
             })
         }
 
-
-
     }
-    //oncreat 닫는
-
 
 
     override fun onBackPressed() {
-
         if(System.currentTimeMillis() - backPressedTime >=1000 ) {
             wb_pdf.visibility = View.INVISIBLE
             backPressedTime = System.currentTimeMillis()

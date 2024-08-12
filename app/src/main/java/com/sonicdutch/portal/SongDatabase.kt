@@ -38,8 +38,8 @@ class SongDatabase {
 
                             Log.e("api error", "songdb create error")
 
+                            // data가 존재하지 않는다면 생성
                             CoroutineScope(Dispatchers.Main).launch {
-
                                 Log.e("database start","make")
 
                                 getInstance(context).songDao().insert(Songentitiy.Song(1,0, 0, "http://kccba.net/sonicdutch/mp3/M0001.mp3","맑은날_새벽"))
@@ -62,9 +62,7 @@ class SongDatabase {
                                 getInstance(context).songDao().insert(Songentitiy.Song(18,5, 6,"http://kccba.net/sonicdutch/mp3/M0012-WOMEN8.mp3","재즈풍 음악 배경_여성음성"))
 
                                 Log.e("test data","songdb create end")
-
                             }
-
 
                         }
 

@@ -34,7 +34,6 @@ class Music_Adapter(private var songs: List<Songentitiy.Song>) : RecyclerView.Ad
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
-
         var context = parent.context
         var inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         var view = inflater.inflate(R.layout.playlist_item, parent, false)
@@ -66,7 +65,6 @@ class Music_Adapter(private var songs: List<Songentitiy.Song>) : RecyclerView.Ad
     }
 
 
-
     override fun getItemCount(): Int {
         return songs.size
     }
@@ -84,7 +82,6 @@ class Music_Adapter(private var songs: List<Songentitiy.Song>) : RecyclerView.Ad
             var choiceviews = view.layoutManager!!.findViewByPosition(choice)
             choiceviews!!.setBackgroundColor(Color.GRAY)
         }
-
         else
         {
             var views = view.layoutManager!!.findViewByPosition(position)
@@ -93,7 +90,6 @@ class Music_Adapter(private var songs: List<Songentitiy.Song>) : RecyclerView.Ad
 
         notifyDataSetChanged()
     }
-
 
 
 
@@ -106,12 +102,10 @@ class Music_Adapter(private var songs: List<Songentitiy.Song>) : RecyclerView.Ad
     private lateinit var itemClickListner: ItemClickListener
 
 
-
     //클릭리스너 등록 매소드
     fun setItemClickListener(itemClickListener: ItemClickListener) {
         this.itemClickListner = itemClickListener
     }
-
 
 
 }
