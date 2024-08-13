@@ -51,7 +51,7 @@ class MainActivity : AppCompatActivity() {
     private var backPressedTime : Long = 0
 
     var cal: Calendar = Calendar.getInstance()
-    val open_decoding = "6f6aP3gCujBq5ihYIEraET/DgrOvkij3nVmab7ZpPzHjVHWW7wWjM+XY5f5yA+5Nve+PAn68P66zPX/9gXSVnQ=="
+    val open_decoding = "공공 데이터 api key"
 
     var gson = GsonBuilder().setLenient().create()
 
